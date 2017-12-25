@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Fabellas</string>
+    <string name="permission_location_rationale">L\'application a besoin d\'accéder à votre position actuelle pour fonctionner correctement</string>
+    <string name="button_allow">Accepter</string>
+    <string name="button_deny">Refuser</string>
+    <string name="permission_camera_denied">Nous sommes désolés d\'apprendre que vous nous refuser l\'accès à votre position... L\'application ne peut malheuresement pas fonctionner.</string>
+    <string name="error_permission_geolocation">Vous devez autoriser la localisation</string>
+    <string name="open_settings">Paramètres</string>
 </resources>
