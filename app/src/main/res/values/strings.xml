@@ -6,4 +6,8 @@
     <string name="permission_camera_denied">Nous sommes désolés d\'apprendre que vous nous refuser l\'accès à votre position... L\'application ne peut malheuresement pas fonctionner.</string>
     <string name="error_permission_geolocation">Vous devez autoriser la localisation</string>
     <string name="open_settings">Paramètres</string>
+    <string name="places_api_connection_failed">Connection failed</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

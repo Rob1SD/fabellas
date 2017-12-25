@@ -21,6 +21,7 @@
         map:layout_constraintRight_toRightOf="parent"
         map:layout_constraintTop_toTopOf="parent"
         map:uiZoomControls="true"
+        map:uiMapToolbar="false"
         />
 
 </android.support.constraint.ConstraintLayout>
