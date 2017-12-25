@@ -9,6 +9,10 @@
     tools:context="groupe_9.com.fabellas.MapActivity"
     >
 
+    <include
+        layout="@layout/toolbar"
+        />
+
     <fragment
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/map"
@@ -19,9 +23,9 @@
         map:layout_constraintBottom_toBottomOf="parent"
         map:layout_constraintLeft_toLeftOf="parent"
         map:layout_constraintRight_toRightOf="parent"
-        map:layout_constraintTop_toTopOf="parent"
-        map:uiZoomControls="true"
+        map:layout_constraintTop_toBottomOf="@+id/toolbar"
         map:uiMapToolbar="false"
+        map:uiZoomControls="true"
         />
 
 </android.support.constraint.ConstraintLayout>

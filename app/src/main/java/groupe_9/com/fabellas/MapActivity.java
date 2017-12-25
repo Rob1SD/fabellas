@@ -11,7 +11,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -47,7 +46,7 @@ import permissions.dispatcher.RuntimePermissions;
 
 @RuntimePermissions
 public class MapActivity
-        extends AppCompatActivity
+        extends FabellasActivity
         implements
         OnMapReadyCallback,
         GoogleApiClient.OnConnectionFailedListener,
@@ -71,6 +70,8 @@ public class MapActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+
+        setUpToolbar(this, getString(R.string.app_name), false);
 
         mapContainer = findViewById(R.id.map_container);
 

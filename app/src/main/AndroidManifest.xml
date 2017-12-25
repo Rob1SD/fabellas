@@ -34,6 +34,8 @@
         </activity>
         <activity android:name=".PlaceStoriesActivity">
         </activity>
+        <activity android:name=".FabellasActivity">
+        </activity>
     </application>
 
 </manifest>
