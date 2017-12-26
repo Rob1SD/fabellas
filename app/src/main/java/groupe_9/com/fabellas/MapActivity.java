@@ -11,20 +11,28 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -46,16 +54,18 @@ import permissions.dispatcher.RuntimePermissions;
 
 @RuntimePermissions
 public class MapActivity
-        extends FabellasActivity
+        extends AppCompatActivity
         implements
         OnMapReadyCallback,
         GoogleApiClient.OnConnectionFailedListener,
         GoogleApiClient.ConnectionCallbacks,
-        GoogleMap.OnInfoWindowClickListener
+        GoogleMap.OnInfoWindowClickListener, View.OnClickListener
 {
-    public static final int ZOOM = 10;
+    public static final int ZOOM = 15;
     private static final int REQUEST_APPLICATION_SETTINGS_CODE = 1000;
+    public static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 2000;
     public static final String PLACE_ID = "placeID";
+    public static final String TAG = "thomasecalle";
 
     private GoogleMap googleMap;
     private String currentPlaceID;
@@ -64,6 +74,7 @@ public class MapActivity
     private View mapContainer;
 
     private GoogleApiClient googleApiClient;
+    private boolean isUserBackFromSearch = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -71,7 +82,7 @@ public class MapActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
-        setUpToolbar(this, getString(R.string.app_name), false);
+        setUpToolbar();
 
         mapContainer = findViewById(R.id.map_container);
 
@@ -132,9 +143,13 @@ public class MapActivity
                     {
                         if (task.isSuccessful() && task.getResult() != null)
                         {
-                            lastLocation = task.getResult();
-                            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lastLocation.getLatitude(),
-                                    lastLocation.getLongitude()), MapActivity.ZOOM));
+                            if (!isUserBackFromSearch)
+                            {
+                                lastLocation = task.getResult();
+                                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lastLocation.getLatitude(),
+                                        lastLocation.getLongitude()), MapActivity.ZOOM));
+                            }
+
                         }
                         else
                         {
@@ -144,6 +159,18 @@ public class MapActivity
                 });
 
         lookForPlaces();
+    }
+
+    @Override
+    public void onInfoWindowClick(Marker marker)
+    {
+        //Toast.makeText(this, "Marker id : " + marker.getTag(), Toast.LENGTH_LONG).show();
+        final Intent intent = new Intent(this, PlaceStoriesActivity.class);
+        final Bundle bundle = new Bundle();
+        bundle.putSerializable(MapActivity.PLACE_ID, (PlaceTag) marker.getTag());
+        intent.putExtras(bundle);
+
+        startActivity(intent);
     }
 
     @Override
@@ -184,26 +211,29 @@ public class MapActivity
             case REQUEST_APPLICATION_SETTINGS_CODE:
                 MapActivityPermissionsDispatcher.goToMyLocationWithPermissionCheck(this, this.googleMap);
                 break;
+
+            case PLACE_AUTOCOMPLETE_REQUEST_CODE:
+                if (resultCode == RESULT_OK)
+                {
+                    isUserBackFromSearch = true;
+                    final Place place = PlaceAutocomplete.getPlace(this, data);
+                    this.googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(), MapActivity.ZOOM));
+                    putMarkerOnPlace(place);
+
+                    Log.i(MapActivity.TAG, "Place Searched : " + place.getName());
+                }
+                else if (resultCode == PlaceAutocomplete.RESULT_ERROR)
+                {
+                    Status status = PlaceAutocomplete.getStatus(this, data);
+                    Log.i(MapActivity.TAG, status.getStatusMessage());
+                }
+                else if (resultCode == RESULT_CANCELED)
+                {
+                    Log.i(MapActivity.TAG, "Search cancelled by user");
+
+                }
         }
-    }
 
-    private void displaySnackBar()
-    {
-        final Snackbar snackbar = Snackbar.make(mapContainer, R.string.error_permission_geolocation, Snackbar.LENGTH_INDEFINITE);
-        snackbar.setAction(R.string.open_settings, new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                final Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                intent.setData(Uri.fromParts("package", BuildConfig.APPLICATION_ID, null));
-                startActivityForResult(intent, MapActivity.REQUEST_APPLICATION_SETTINGS_CODE);
-
-                snackbar.dismiss();
-            }
-        });
-
-        snackbar.show();
     }
 
     @Override
@@ -235,44 +265,97 @@ public class MapActivity
             @Override
             public void onResult(PlaceLikelihoodBuffer likelyPlaces)
             {
-                boolean centerToLocation = false;
                 for (PlaceLikelihood placeLikelihood : likelyPlaces)
                 {
                     final Place place = placeLikelihood.getPlace();
 
+                    Log.i(MapActivity.TAG, String.format("Place '%s' found with id: '%s'", place.getName(), place.getId()));
 
-                    if (!centerToLocation)
-                    {
-                        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(), 15));
-                        centerToLocation = true;
-                    }
-
-
-                    Log.i("thomasecalle", String.format("Place '%s' found with id: '%s'", place.getName(), place.getId()));
-
-                    final Marker marker = googleMap.addMarker(new MarkerOptions()
-                            .position(place.getLatLng())
-                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-                            .title(place.getName().toString()));
-
-                    final PlaceTag placeTag = new PlaceTag(place.getName().toString(), place.getId());
-                    marker.setTag(placeTag);
+                    putMarkerOnPlace(place);
 
                 }
                 likelyPlaces.release();
             }
         });
+
+
     }
 
     @Override
-    public void onInfoWindowClick(Marker marker)
+    public void onClick(View view)
     {
-        //Toast.makeText(this, "Marker id : " + marker.getTag(), Toast.LENGTH_LONG).show();
-        final Intent intent = new Intent(this, PlaceStoriesActivity.class);
-        final Bundle bundle = new Bundle();
-        bundle.putSerializable(MapActivity.PLACE_ID, (PlaceTag) marker.getTag());
-        intent.putExtras(bundle);
-
-        startActivity(intent);
+        switch (view.getId())
+        {
+            case R.id.icon:
+                lookForUniquePlace();
+                break;
+        }
     }
+
+    private void putMarkerOnPlace(Place place)
+    {
+        final Marker marker = googleMap.addMarker(new MarkerOptions()
+                .position(place.getLatLng())
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                .title(place.getName().toString()));
+
+        final PlaceTag placeTag = new PlaceTag(place.getName().toString(), place.getId());
+        marker.setTag(placeTag);
+    }
+
+    private void lookForUniquePlace()
+    {
+        try
+        {
+            final Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN)
+                    .setFilter(null)
+                    .build(this);
+            startActivityForResult(intent, MapActivity.PLACE_AUTOCOMPLETE_REQUEST_CODE);
+        }
+        catch (GooglePlayServicesRepairableException e)
+        {
+            Toast.makeText(this, "An error occured", Toast.LENGTH_SHORT).show();
+
+        }
+        catch (GooglePlayServicesNotAvailableException e)
+        {
+            Toast.makeText(this, "Google services not availables", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void setUpToolbar()
+    {
+        final Toolbar toolbar = findViewById(R.id.toolbar);
+        final TextView toolbarTitle = toolbar.findViewById(R.id.title);
+
+        final ImageView iconImageView = findViewById(R.id.icon);
+        iconImageView.setImageResource(R.drawable.ic_search);
+        iconImageView.setOnClickListener(this);
+
+        toolbarTitle.setText(R.string.app_name);
+
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+    }
+
+    private void displaySnackBar()
+    {
+        final Snackbar snackbar = Snackbar.make(mapContainer, R.string.error_permission_geolocation, Snackbar.LENGTH_INDEFINITE);
+        snackbar.setAction(R.string.open_settings, new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                final Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                intent.setData(Uri.fromParts("package", BuildConfig.APPLICATION_ID, null));
+                startActivityForResult(intent, MapActivity.REQUEST_APPLICATION_SETTINGS_CODE);
+
+                snackbar.dismiss();
+            }
+        });
+
+        snackbar.show();
+    }
+
+
 }

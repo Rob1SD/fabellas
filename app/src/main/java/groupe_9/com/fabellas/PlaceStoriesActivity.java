@@ -3,12 +3,17 @@ package groupe_9.com.fabellas;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import groupe_9.com.fabellas.bo.PlaceTag;
 import groupe_9.com.fabellas.fragments.PlaceStoriesFragment;
 
-public class PlaceStoriesActivity extends FabellasActivity
+public class PlaceStoriesActivity
+        extends AppCompatActivity
 {
 
     private String title;
@@ -40,7 +45,7 @@ public class PlaceStoriesActivity extends FabellasActivity
             }
         }
 
-        setUpToolbar(this, title, true);
+        setUpToolbar();
     }
 
     @Override
@@ -55,5 +60,20 @@ public class PlaceStoriesActivity extends FabellasActivity
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void setUpToolbar()
+    {
+        final Toolbar toolbar = findViewById(R.id.toolbar);
+        final TextView toolbarTitle = toolbar.findViewById(R.id.title);
+
+        final ImageView iconImageView = findViewById(R.id.icon);
+        iconImageView.setImageResource(R.drawable.ic_add);
+        toolbarTitle.setText(this.title);
+
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
 }
