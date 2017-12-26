@@ -38,6 +38,9 @@
             android:layout_height="wrap_content"
             tools:src="@drawable/ic_search"
             android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
             />
     </LinearLayout>
 
