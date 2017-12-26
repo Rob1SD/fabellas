@@ -27,6 +27,9 @@
             android:textStyle="bold"
             android:layout_weight="4"
             tools:text="Title tres tres tres long"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
             />
 
         <ImageView
