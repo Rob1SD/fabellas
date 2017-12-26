@@ -45,6 +45,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 import groupe_9.com.fabellas.bo.PlaceTag;
+import groupe_9.com.fabellas.utils.FabellasSettingsRequest;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnNeverAskAgain;
 import permissions.dispatcher.OnPermissionDenied;
@@ -63,7 +64,10 @@ public class MapActivity
 {
     public static final int ZOOM = 15;
     private static final int REQUEST_APPLICATION_SETTINGS_CODE = 1000;
-    public static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 2000;
+    private static final int REQUEST_LOCATION_ON_SETTINGS_CODE = 2000;
+    public static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 3000;
+
+
     public static final String PLACE_ID = "placeID";
     public static final String TAG = "thomasecalle";
 
@@ -127,6 +131,7 @@ public class MapActivity
     {
         this.googleMap = googleMap;
         this.googleMap.setOnInfoWindowClickListener(this);
+        MapActivityPermissionsDispatcher.goToMyLocationWithPermissionCheck(this, googleMap);
     }
 
     @SuppressLint("MissingPermission")
@@ -153,7 +158,7 @@ public class MapActivity
                         }
                         else
                         {
-                            Toast.makeText(MapActivity.this, "Something went wrong looking for position", Toast.LENGTH_SHORT).show();
+                            displaySnackBar(FabellasSettingsRequest.LOCATION_ON_REQUEST);
                         }
                     }
                 });
@@ -194,13 +199,13 @@ public class MapActivity
     @OnPermissionDenied(Manifest.permission.ACCESS_FINE_LOCATION)
     void showDeniedForLocation()
     {
-        displaySnackBar();
+        displaySnackBar(FabellasSettingsRequest.PERMISSION_REQUEST);
     }
 
     @OnNeverAskAgain(Manifest.permission.ACCESS_FINE_LOCATION)
     public void onNeverAskAgain()
     {
-        displaySnackBar();
+        displaySnackBar(FabellasSettingsRequest.PERMISSION_REQUEST);
     }
 
     @Override
@@ -209,6 +214,10 @@ public class MapActivity
         switch (requestCode)
         {
             case REQUEST_APPLICATION_SETTINGS_CODE:
+                MapActivityPermissionsDispatcher.goToMyLocationWithPermissionCheck(this, this.googleMap);
+                break;
+
+            case REQUEST_LOCATION_ON_SETTINGS_CODE:
                 MapActivityPermissionsDispatcher.goToMyLocationWithPermissionCheck(this, this.googleMap);
                 break;
 
@@ -245,7 +254,6 @@ public class MapActivity
     @Override
     public void onConnected(@Nullable Bundle bundle)
     {
-        MapActivityPermissionsDispatcher.goToMyLocationWithPermissionCheck(this, googleMap);
     }
 
     @Override
@@ -338,17 +346,31 @@ public class MapActivity
         getSupportActionBar().setDisplayShowTitleEnabled(false);
     }
 
-    private void displaySnackBar()
+    private void displaySnackBar(FabellasSettingsRequest settingsRequest)
     {
         final Snackbar snackbar = Snackbar.make(mapContainer, R.string.error_permission_geolocation, Snackbar.LENGTH_INDEFINITE);
         snackbar.setAction(R.string.open_settings, new View.OnClickListener()
         {
+            Intent intent = null;
+            int requestCode = 0;
+
             @Override
             public void onClick(View view)
             {
-                final Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                intent.setData(Uri.fromParts("package", BuildConfig.APPLICATION_ID, null));
-                startActivityForResult(intent, MapActivity.REQUEST_APPLICATION_SETTINGS_CODE);
+                switch (settingsRequest)
+                {
+                    case PERMISSION_REQUEST:
+                        intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        intent.setData(Uri.fromParts("package", BuildConfig.APPLICATION_ID, null));
+                        requestCode = MapActivity.REQUEST_APPLICATION_SETTINGS_CODE;
+                        break;
+
+                    case LOCATION_ON_REQUEST:
+                        intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        requestCode = MapActivity.REQUEST_LOCATION_ON_SETTINGS_CODE;
+                        break;
+                }
+                startActivityForResult(intent, requestCode);
 
                 snackbar.dismiss();
             }
