@@ -170,7 +170,7 @@ public class MapActivity
     public void onInfoWindowClick(Marker marker)
     {
         //Toast.makeText(this, "Marker id : " + marker.getTag(), Toast.LENGTH_LONG).show();
-        final Intent intent = new Intent(this, PlaceStoriesActivity.class);
+        final Intent intent = new Intent(this, StoriesListActivity.class);
         final Bundle bundle = new Bundle();
         bundle.putSerializable(MapActivity.PLACE_ID, (PlaceTag) marker.getTag());
         intent.putExtras(bundle);
