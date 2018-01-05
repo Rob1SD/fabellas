@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "76038334460",
+    "firebase_url": "https://fabellas-1d1c5.firebaseio.com",
+    "project_id": "fabellas-1d1c5",
+    "storage_bucket": "fabellas-1d1c5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:76038334460:android:cd19de63a3c17564",
+        "android_client_info": {
+          "package_name": "groupe_9.com.fabellas"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "76038334460-pf8kpuorro6d57jn2ak8q1rkhvdjtrab.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "groupe_9.com.fabellas",
+            "certificate_hash": "ff4a825bba11b8c417a817e42bb4c47d12840dc7"
+          }
+        },
+        {
+          "client_id": "76038334460-25qg2q3uu5i9uup49jm653ces0rq8neo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkqZBaY3fKp53LxOcIJ_1DQ260bPlzJB4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "76038334460-25qg2q3uu5i9uup49jm653ces0rq8neo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
