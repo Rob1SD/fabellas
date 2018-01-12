@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "76038334460",
-    "firebase_url": "https://fabellas-1d1c5.firebaseio.com",
-    "project_id": "fabellas-1d1c5",
-    "storage_bucket": "fabellas-1d1c5.appspot.com"
+    "project_number": "1070511646144",
+    "firebase_url": "https://fabellas-96fb7.firebaseio.com",
+    "project_id": "fabellas-96fb7",
+    "storage_bucket": "fabellas-96fb7.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:76038334460:android:cd19de63a3c17564",
+        "mobilesdk_app_id": "1:1070511646144:android:cd19de63a3c17564",
         "android_client_info": {
           "package_name": "groupe_9.com.fabellas"
         }
       },
       "oauth_client": [
         {
-          "client_id": "76038334460-pf8kpuorro6d57jn2ak8q1rkhvdjtrab.apps.googleusercontent.com",
+          "client_id": "1070511646144-ol6fh1jh6t2dsgoprvie3ohquh3vkiln.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "groupe_9.com.fabellas",
@@ -23,13 +23,13 @@
           }
         },
         {
-          "client_id": "76038334460-25qg2q3uu5i9uup49jm653ces0rq8neo.apps.googleusercontent.com",
+          "client_id": "1070511646144-n3dar11413ppnoku92btduv7srn2g2p7.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCkqZBaY3fKp53LxOcIJ_1DQ260bPlzJB4"
+          "current_key": "AIzaSyACK6-dCk2g5gd-M5-NLHT_CozT8ZHG3vs"
         }
       ],
       "services": {
@@ -40,7 +40,7 @@
           "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "76038334460-25qg2q3uu5i9uup49jm653ces0rq8neo.apps.googleusercontent.com",
+              "client_id": "1070511646144-n3dar11413ppnoku92btduv7srn2g2p7.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

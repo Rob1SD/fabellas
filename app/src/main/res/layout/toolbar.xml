@@ -33,6 +33,17 @@
             />
 
         <ImageView
+            android:id="@+id/icon_logout"
+            android:layout_width="9dp"
+            android:layout_height="25dp"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            tools:src="@drawable/ic_log_out"
+            />
+
+        <ImageView
             android:id="@+id/icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -43,6 +43,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 
 import groupe_9.com.fabellas.bo.PlaceTag;
 import groupe_9.com.fabellas.utils.FabellasSettingsRequest;
@@ -108,6 +109,10 @@ public class MapActivity
     protected void onResume()
     {
         super.onResume();
+        if(null == FirebaseAuth.getInstance().getCurrentUser()){
+            startActivity(new Intent(this, ConnectionActivity.class));
+            finish();
+        }
 
         if (googleApiClient != null)
         {
@@ -297,6 +302,12 @@ public class MapActivity
             case R.id.icon:
                 lookForUniquePlace();
                 break;
+            case R.id.icon_logout:
+                FirebaseAuth.getInstance().signOut();
+                startActivity(new Intent(this, ConnectionActivity.class));
+                finish();
+                break;
+
         }
     }
 
@@ -339,7 +350,9 @@ public class MapActivity
         final ImageView iconImageView = findViewById(R.id.icon);
         iconImageView.setImageResource(R.drawable.ic_search);
         iconImageView.setOnClickListener(this);
-
+        final ImageView logoutIconImageView = findViewById(R.id.icon_logout);
+        logoutIconImageView.setImageResource(R.drawable.ic_log_out);
+        logoutIconImageView.setOnClickListener(this);
         toolbarTitle.setText(R.string.app_name);
 
         setSupportActionBar(toolbar);
