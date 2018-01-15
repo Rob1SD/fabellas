@@ -1,22 +1,16 @@
 package groupe_9.com.fabellas;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.List;
-
+import groupe_9.com.fabellas.adapters.SimpleItemRecyclerViewAdapter;
 import groupe_9.com.fabellas.bo.PlaceTag;
-import groupe_9.com.fabellas.fragments.StorieDetailFragment;
 
 public class StoriesListActivity extends AppCompatActivity
 {
@@ -46,97 +40,16 @@ public class StoriesListActivity extends AppCompatActivity
             isIntwoPanes = true;
         }
 
-        final View recyclerView = findViewById(R.id.item_list);
-        if (recyclerView != null)
+        final View listView = findViewById(R.id.item_list);
+        if (listView != null)
         {
-            setupRecyclerView((RecyclerView) recyclerView);
+            setupRecyclerView((RecyclerView) listView);
         }
     }
 
     private void setupRecyclerView(RecyclerView recyclerView)
     {
         recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, DummyContent.ITEMS, isIntwoPanes));
-    }
-
-    public static class SimpleItemRecyclerViewAdapter
-            extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder>
-    {
-
-        private final StoriesListActivity mParentActivity;
-        private final List<DummyContent.DummyItem> values;
-        private final boolean isInTwoPane;
-        private final View.OnClickListener mOnClickListener = new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                final DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
-                if (isInTwoPane)
-                {
-                    final Bundle arguments = new Bundle();
-                    arguments.putString(StorieDetailFragment.ARG_ITEM_ID, item.id);
-                    final StorieDetailFragment fragment = new StorieDetailFragment();
-                    fragment.setArguments(arguments);
-                    mParentActivity.getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.item_detail_container, fragment)
-                            .commit();
-                }
-                else
-                {
-                    final Context context = view.getContext();
-                    final Intent intent = new Intent(context, StorieDetailActivity.class);
-                    intent.putExtra(StorieDetailFragment.ARG_ITEM_ID, item.id);
-
-                    context.startActivity(intent);
-                }
-            }
-        };
-
-        SimpleItemRecyclerViewAdapter(StoriesListActivity parent,
-                                      List<DummyContent.DummyItem> items,
-                                      boolean isInTwoPane)
-        {
-            values = items;
-            mParentActivity = parent;
-            this.isInTwoPane = isInTwoPane;
-        }
-
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
-        {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_list_content, parent, false);
-            return new ViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(final ViewHolder holder, int position)
-        {
-            holder.title.setText(values.get(position).id);
-            holder.content.setText(values.get(position).content);
-
-            holder.itemView.setTag(values.get(position));
-            holder.itemView.setOnClickListener(mOnClickListener);
-        }
-
-        @Override
-        public int getItemCount()
-        {
-            return values.size();
-        }
-
-        class ViewHolder extends RecyclerView.ViewHolder
-        {
-            final TextView title;
-            final TextView content;
-
-            ViewHolder(View view)
-            {
-                super(view);
-                title = view.findViewById(R.id.id_text);
-                content = view.findViewById(R.id.content);
-            }
-        }
     }
 
     @Override
