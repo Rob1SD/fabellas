@@ -16,22 +16,19 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 
-import java.util.List;
-
-import groupe_9.com.fabellas.DummyContent;
 import groupe_9.com.fabellas.MapActivity;
 import groupe_9.com.fabellas.R;
 
 /**
- * The configuration screen for the {@link FabellasAppWidget FabellasAppWidget} AppWidget.
+ * The configuration screen for the {@link FabellasAppWidgetProvider FabellasAppWidgetProvider} AppWidget.
  */
 public class FabellasAppWidgetConfigureActivity
         extends Activity
         implements View.OnClickListener
 {
 
-    private static final String PREFS_NAME = "groupe_9.com.fabellas.widget.FabellasAppWidget";
-    private static final String PREFS_LIST = "groupe_9.com.fabellas.widget.FabellasAppWidget.LIST";
+    private static final String PREFS_NAME = "groupe_9.com.fabellas.widget.FabellasAppWidgetProvider";
+    private static final String PREFS_LIST = "groupe_9.com.fabellas.widget.FabellasAppWidgetProvider.LIST";
     private static final String PREF_PREFIX_KEY = "appwidget_";
     int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
 
@@ -53,7 +50,7 @@ public class FabellasAppWidgetConfigureActivity
 
                     // It is the responsibility of the configuration activity to update the app widget
                     AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
-                    FabellasAppWidget.updateAppWidget(this, appWidgetManager, mAppWidgetId);
+                    FabellasAppWidgetProvider.updateAppWidget(this, appWidgetManager, mAppWidgetId);
 
                     // Make sure we pass back the original appWidgetId
                     Intent resultValue = new Intent();
@@ -170,7 +167,7 @@ public class FabellasAppWidgetConfigureActivity
 
             // It is the responsibility of the configuration activity to update the app widget
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-            FabellasAppWidget.updateAppWidget(context, appWidgetManager, mAppWidgetId);
+            FabellasAppWidgetProvider.updateAppWidget(context, appWidgetManager, mAppWidgetId);
 
             // Make sure we pass back the original appWidgetId
             Intent resultValue = new Intent();

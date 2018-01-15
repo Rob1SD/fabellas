@@ -96,8 +96,8 @@ public class SimpleItemRecyclerViewAdapter
         StorieViewHolder(View view)
         {
             super(view);
-            title = view.findViewById(R.id.id_text);
-            content = view.findViewById(R.id.content);
+            title = view.findViewById(R.id.title);
+            content = view.findViewById(R.id.details);
         }
     }
 }

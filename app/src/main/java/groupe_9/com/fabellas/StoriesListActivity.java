@@ -1,5 +1,6 @@
 package groupe_9.com.fabellas;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 
 import groupe_9.com.fabellas.adapters.SimpleItemRecyclerViewAdapter;
 import groupe_9.com.fabellas.bo.PlaceTag;
+import groupe_9.com.fabellas.widget.FabellasAppWidgetProvider;
 
 public class StoriesListActivity extends AppCompatActivity
 {
@@ -25,11 +27,18 @@ public class StoriesListActivity extends AppCompatActivity
 
         if ((getIntent() != null))
         {
-            if ((getIntent().getExtras() != null))
+            final Intent intent = getIntent();
+
+            if (intent.getStringExtra(FabellasAppWidgetProvider.APPWIDGET_TITLE_EXTRA) != null)
             {
-                final Bundle extras = getIntent().getExtras();
+                this.title = intent.getStringExtra(FabellasAppWidgetProvider.APPWIDGET_TITLE_EXTRA);
+            }
+            else if ((getIntent().getExtras() != null))
+            {
+                final Bundle extras = intent.getExtras();
                 this.title = ((PlaceTag) extras.getSerializable(MapActivity.PLACE_ID)).getTitle();
             }
+
         }
 
         setUpToolbar();

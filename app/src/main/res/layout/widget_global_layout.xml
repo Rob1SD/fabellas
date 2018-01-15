@@ -19,10 +19,11 @@
         />
 
     <ListView
+        android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/appwidget_title"
-        android:background="@color/colorPrimary"
+        android:background="@color/white"
         >
 
 
