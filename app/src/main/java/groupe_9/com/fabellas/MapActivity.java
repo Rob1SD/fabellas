@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.ui.auth.data.model.User;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -44,6 +45,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import groupe_9.com.fabellas.bo.PlaceTag;
 import groupe_9.com.fabellas.utils.FabellasSettingsRequest;
@@ -303,7 +305,11 @@ public class MapActivity
                 lookForUniquePlace();
                 break;
             case R.id.icon_logout:
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 FirebaseAuth.getInstance().signOut();
+                if(user.isAnonymous()) {
+                    user.delete();
+                }
                 startActivity(new Intent(this, ConnectionActivity.class));
                 finish();
                 break;

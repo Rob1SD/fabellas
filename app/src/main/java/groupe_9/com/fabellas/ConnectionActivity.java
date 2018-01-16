@@ -1,6 +1,7 @@
 package groupe_9.com.fabellas;
 
 import android.content.Intent;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,9 +18,14 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
+
+import groupe_9.com.fabellas.bo.User;
 
 public class ConnectionActivity extends AppCompatActivity {
 
@@ -27,12 +33,14 @@ public class ConnectionActivity extends AppCompatActivity {
     private Button connectPhoneBtn;
     private Button connectGuestBtn;
     private FirebaseAuth mAuth;
+    private DatabaseReference mDatabaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connection);
         mAuth = FirebaseAuth.getInstance();
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference("Users");
         if (mAuth.getCurrentUser() != null) {
             startActivity(new Intent(this, MapActivity.class));
             finish();
@@ -80,11 +88,12 @@ public class ConnectionActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == RC_SIGN_IN) {
-            IdpResponse response = IdpResponse.fromResultIntent(data);
-
             if (resultCode == ResultCodes.OK) {
-                // Successfully signed in
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if(true){
+                    //verif de l'existence du user
+                }
+                mDatabaseReference.child(user.getUid()).setValue(new User(user.getUid(), user.getPhoneNumber(), null));
                 startActivity(new Intent(ConnectionActivity.this, MapActivity.class));
                 finish();
             } else {
