@@ -27,22 +27,10 @@ public class StoriesListActivity extends AppCompatActivity
 
         if ((getIntent() != null))
         {
-            final Intent intent = getIntent();
-
-            if (intent.getStringExtra(FabellasAppWidgetProvider.APPWIDGET_TITLE_EXTRA) != null)
-            {
-                this.title = intent.getStringExtra(FabellasAppWidgetProvider.APPWIDGET_TITLE_EXTRA);
-            }
-            else if ((getIntent().getExtras() != null))
-            {
-                final Bundle extras = intent.getExtras();
-                this.title = ((PlaceTag) extras.getSerializable(MapActivity.PLACE_ID)).getTitle();
-            }
-
+            handleIntent(getIntent());
         }
 
         setUpToolbar();
-
 
         if (findViewById(R.id.item_detail_container) != null)
         {
@@ -88,5 +76,25 @@ public class StoriesListActivity extends AppCompatActivity
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+    }
+
+    private void handleIntent(Intent intent)
+    {
+        final Bundle bundle = intent.getExtras();
+
+        if ((bundle.getString(FabellasAppWidgetProvider.APPWIDGET_PLACE_ID_EXTRA) != null))
+        {
+            this.title = (bundle.getString(FabellasAppWidgetProvider.APPWIDGET_TITLE_EXTRA));
+        }
+        else
+        {
+            final PlaceTag placeTag = (PlaceTag) bundle.getSerializable(MapActivity.PLACE_ID);
+            loadPlaceData(placeTag.getTitle(), placeTag.getId());
+        }
+    }
+
+    private void loadPlaceData(String title, String id)
+    {
+        this.title = title;
     }
 }

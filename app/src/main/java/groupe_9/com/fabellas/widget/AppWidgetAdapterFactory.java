@@ -9,7 +9,6 @@ import android.widget.RemoteViewsService;
 import java.util.List;
 
 import groupe_9.com.fabellas.DummyContent;
-import groupe_9.com.fabellas.MapActivity;
 import groupe_9.com.fabellas.R;
 
 /**
@@ -72,7 +71,8 @@ public class AppWidgetAdapterFactory
         remoteViews.setTextViewText(R.id.details, list.get(position).details);
 
         final Intent fillInIntent = new Intent();
-        fillInIntent.putExtra(MapActivity.PLACE_ID, list.get(position).content);
+        fillInIntent.putExtra(FabellasAppWidgetProvider.APPWIDGET_PLACE_ID_EXTRA, list.get(position).content);
+
         remoteViews.setOnClickFillInIntent(R.id.widget_item_container, fillInIntent);
 
         return remoteViews;

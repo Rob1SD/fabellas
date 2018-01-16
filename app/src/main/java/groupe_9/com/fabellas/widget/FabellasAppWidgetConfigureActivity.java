@@ -28,7 +28,7 @@ public class FabellasAppWidgetConfigureActivity
 {
 
     private static final String PREFS_NAME = "groupe_9.com.fabellas.widget.FabellasAppWidgetProvider";
-    private static final String PREFS_LIST = "groupe_9.com.fabellas.widget.FabellasAppWidgetProvider.LIST";
+    private static final String PREFS_ID = "groupe_9.com.fabellas.widget.FabellasAppWidgetProvider.ID";
     private static final String PREF_PREFIX_KEY = "appwidget_";
     int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
 
@@ -47,6 +47,7 @@ public class FabellasAppWidgetConfigureActivity
                     Log.i(MapActivity.TAG, "Place Searched on widget configure activity: " + place.getName());
 
                     saveTitlePref(this, mAppWidgetId, place.getName().toString());
+                    saveIDPref(this, mAppWidgetId, place.getName().toString());
 
                     // It is the responsibility of the configuration activity to update the app widget
                     AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
@@ -86,6 +87,14 @@ public class FabellasAppWidgetConfigureActivity
         prefs.apply();
     }
 
+    // Write the ID of the place
+    static void saveIDPref(Context context, int appWidgetId, String id)
+    {
+        SharedPreferences.Editor prefs = context.getSharedPreferences(PREFS_ID, 0).edit();
+        prefs.putString(PREF_PREFIX_KEY + appWidgetId, id);
+        prefs.apply();
+    }
+
     // Read the prefix from the SharedPreferences object for this widget.
     // If there is no preference saved, get the default from a resource
     static String loadTitlePref(Context context, int appWidgetId)
@@ -102,9 +111,30 @@ public class FabellasAppWidgetConfigureActivity
         }
     }
 
+    static String loadIDPref(Context context, int appWidgetId)
+    {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_ID, 0);
+        String idValue = prefs.getString(PREF_PREFIX_KEY + appWidgetId, null);
+        if (idValue != null)
+        {
+            return idValue;
+        }
+        else
+        {
+            return context.getString(R.string.appwidget_text);
+        }
+    }
+
     static void deleteTitlePref(Context context, int appWidgetId)
     {
         SharedPreferences.Editor prefs = context.getSharedPreferences(PREFS_NAME, 0).edit();
+        prefs.remove(PREF_PREFIX_KEY + appWidgetId);
+        prefs.apply();
+    }
+
+    static void deleteIDPref(Context context, int appWidgetId)
+    {
+        SharedPreferences.Editor prefs = context.getSharedPreferences(PREFS_ID, 0).edit();
         prefs.remove(PREF_PREFIX_KEY + appWidgetId);
         prefs.apply();
     }
@@ -118,7 +148,7 @@ public class FabellasAppWidgetConfigureActivity
         // out of the widget placement if the user presses the back button.
         setResult(RESULT_CANCELED);
 
-        setContentView(R.layout.fabellas_app_widget_configure);
+        setContentView(R.layout.widget_configure_layout);
         findViewById(R.id.add_button).setOnClickListener(this);
 
         // Find the widget id from the intent.

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
-    android:id="@+id/widget_item_container"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/widget_item_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -16,7 +16,9 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:textAppearance="?attr/textAppearanceListItem"
+        android:textColor="@color/black"
         android:textSize="@dimen/list_item_title"
+        android:textStyle="bold"
         tools:text="title"
         />
 
@@ -27,6 +29,7 @@
         android:ellipsize="end"
         android:maxLines="3"
         android:textAppearance="?attr/textAppearanceListItem"
+        android:textColor="@color/grey"
         android:textSize="@dimen/list_item_details"
         tools:text="details details details details details details details details
         details details details details details details details details details "

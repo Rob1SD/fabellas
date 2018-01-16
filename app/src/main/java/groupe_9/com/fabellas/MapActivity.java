@@ -63,7 +63,7 @@ public class MapActivity
         GoogleApiClient.ConnectionCallbacks,
         GoogleMap.OnInfoWindowClickListener, View.OnClickListener
 {
-    public static final int ZOOM = 15;
+    public static final int ZOOM = 18;
     private static final int REQUEST_APPLICATION_SETTINGS_CODE = 1000;
     private static final int REQUEST_LOCATION_ON_SETTINGS_CODE = 2000;
     public static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 3000;
