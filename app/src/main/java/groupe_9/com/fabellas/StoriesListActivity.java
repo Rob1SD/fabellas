@@ -2,22 +2,35 @@ package groupe_9.com.fabellas;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import groupe_9.com.fabellas.adapters.SimpleItemRecyclerViewAdapter;
 import groupe_9.com.fabellas.bo.PlaceTag;
+import groupe_9.com.fabellas.bo.Story;
+import groupe_9.com.fabellas.bo.User;
 import groupe_9.com.fabellas.widget.FabellasAppWidgetProvider;
 
 public class StoriesListActivity extends AppCompatActivity
 {
     private boolean isIntwoPanes;
     private String title;
+    private String id;
+    private DatabaseReference mDatabaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -42,6 +55,40 @@ public class StoriesListActivity extends AppCompatActivity
         {
             setupRecyclerView((RecyclerView) listView);
         }
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference("Places").child(this.id).child("stories");
+        mDatabaseReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                DatabaseReference mChildDatabaseReference =
+                    FirebaseDatabase.getInstance().getReference("Stories").child(dataSnapshot.getValue().toString());
+                mChildDatabaseReference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Story story = dataSnapshot.getValue(Story.class);
+                        Log.i("StoriesActivity", story.placeId);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) { }
+                });
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
+        });
     }
 
     private void setupRecyclerView(RecyclerView recyclerView)
@@ -96,5 +143,6 @@ public class StoriesListActivity extends AppCompatActivity
     private void loadPlaceData(String title, String id)
     {
         this.title = title;
+        this.id = id;
     }
 }
