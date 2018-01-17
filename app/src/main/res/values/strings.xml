@@ -17,4 +17,5 @@
     <string name="configure">Configure</string>
     <string name="add_place_widget">Sélectionner un lieu</string>
     <string name="list_empty">Aucune anecdote !</string>
+    <string name="no_data_available">Aucune Anecdote renseignée.</string>
 </resources>

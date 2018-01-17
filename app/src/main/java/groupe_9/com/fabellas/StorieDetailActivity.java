@@ -6,11 +6,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import groupe_9.com.fabellas.bo.Story;
 import groupe_9.com.fabellas.fragments.StorieDetailFragment;
 
 public class StorieDetailActivity extends AppCompatActivity
 {
 
+    private Story storie;
     private String title;
 
     @Override
@@ -21,13 +23,19 @@ public class StorieDetailActivity extends AppCompatActivity
 
 
         final Bundle arguments = new Bundle();
-        title = getIntent().getStringExtra(StorieDetailFragment.ARG_ITEM_ID);
-        arguments.putString(StorieDetailFragment.ARG_ITEM_ID, title);
-        final StorieDetailFragment fragment = new StorieDetailFragment();
-        fragment.setArguments(arguments);
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.item_detail_container, fragment)
-                .commit();
+
+        if (getIntent() != null && getIntent().getSerializableExtra(StorieDetailFragment.STORIE_EXTRA) != null)
+        {
+            this.storie = (Story) getIntent().getSerializableExtra(StorieDetailFragment.STORIE_EXTRA);
+            this.title = storie.title;
+            arguments.putSerializable(StorieDetailFragment.STORIE_EXTRA, storie);
+            final StorieDetailFragment fragment = new StorieDetailFragment();
+            fragment.setArguments(arguments);
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.item_detail_container, fragment)
+                    .commit();
+        }
+
 
         setUpToolbar();
 

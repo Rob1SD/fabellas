@@ -7,14 +7,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import groupe_9.com.fabellas.DummyContent;
 import groupe_9.com.fabellas.R;
+import groupe_9.com.fabellas.bo.Story;
 
 public class StorieDetailFragment extends Fragment
 {
-    public static final String ARG_ITEM_ID = "item_id";
+    public static final String STORIE_EXTRA = "storieExtra";
 
-    private DummyContent.DummyItem storie;
+    private Story storie;
 
     public StorieDetailFragment()
     {
@@ -25,9 +25,9 @@ public class StorieDetailFragment extends Fragment
     {
         super.onCreate(savedInstanceState);
 
-        if (getArguments().containsKey(ARG_ITEM_ID))
+        if (getArguments().getSerializable(STORIE_EXTRA) != null)
         {
-            storie = DummyContent.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
+            storie = (Story) getArguments().getSerializable(STORIE_EXTRA);
         }
     }
 
@@ -39,7 +39,7 @@ public class StorieDetailFragment extends Fragment
 
         if (storie != null)
         {
-            ((TextView) rootView.findViewById(R.id.storie_detail)).setText(storie.details);
+            ((TextView) rootView.findViewById(R.id.storie_detail)).setText(storie.detail);
         }
 
         return rootView;

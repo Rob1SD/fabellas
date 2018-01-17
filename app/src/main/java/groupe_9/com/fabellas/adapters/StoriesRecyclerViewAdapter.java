@@ -21,8 +21,8 @@ import groupe_9.com.fabellas.fragments.StorieDetailFragment;
  * Created by thoma on 15/01/2018.
  */
 
-public class SimpleItemRecyclerViewAdapter
-        extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.StorieViewHolder>
+public class StoriesRecyclerViewAdapter
+        extends RecyclerView.Adapter<StoriesRecyclerViewAdapter.StorieViewHolder>
 {
 
     private final StoriesListActivity mParentActivity;
@@ -33,31 +33,31 @@ public class SimpleItemRecyclerViewAdapter
         @Override
         public void onClick(View view)
         {
-            final Story item = (Story) view.getTag();
+            final Story storie = (Story) view.getTag();
             if (isInTwoPane)
             {
                 final Bundle arguments = new Bundle();
-                arguments.putString(StorieDetailFragment.ARG_ITEM_ID, item.title);
+                arguments.putSerializable(StorieDetailFragment.STORIE_EXTRA, storie);
+
                 final StorieDetailFragment fragment = new StorieDetailFragment();
                 fragment.setArguments(arguments);
-                mParentActivity.getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.item_detail_container, fragment)
+                mParentActivity.getSupportFragmentManager().beginTransaction().replace(R.id.item_detail_container, fragment)
                         .commit();
             }
             else
             {
                 final Context context = view.getContext();
                 final Intent intent = new Intent(context, StorieDetailActivity.class);
-                intent.putExtra(StorieDetailFragment.ARG_ITEM_ID, item.title);
+                intent.putExtra(StorieDetailFragment.STORIE_EXTRA, storie);
 
                 context.startActivity(intent);
             }
         }
     };
 
-    public SimpleItemRecyclerViewAdapter(StoriesListActivity parent,
-                                         ArrayList<Story> stories,
-                                         boolean isInTwoPane)
+    public StoriesRecyclerViewAdapter(StoriesListActivity parent,
+                                      ArrayList<Story> stories,
+                                      boolean isInTwoPane)
     {
         this.stories = stories;
         mParentActivity = parent;

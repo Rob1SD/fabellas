@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,7 +20,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-import groupe_9.com.fabellas.adapters.SimpleItemRecyclerViewAdapter;
+import groupe_9.com.fabellas.adapters.StoriesRecyclerViewAdapter;
 import groupe_9.com.fabellas.bo.PlaceTag;
 import groupe_9.com.fabellas.bo.Story;
 import groupe_9.com.fabellas.widget.FabellasAppWidgetProvider;
@@ -31,7 +32,9 @@ public class StoriesListActivity extends AppCompatActivity
     private String id;
     private DatabaseReference mDatabaseReference;
     private ArrayList<Story> stories;
-    private SimpleItemRecyclerViewAdapter adapter;
+    private StoriesRecyclerViewAdapter adapter;
+    private RecyclerView recyclerView;
+    private TextView emptyView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -53,19 +56,19 @@ public class StoriesListActivity extends AppCompatActivity
             isIntwoPanes = true;
         }
 
-        final RecyclerView recyclerView = findViewById(R.id.item_list);
-        if (recyclerView != null)
-        {
-            setupRecyclerView(recyclerView);
-        }
+        recyclerView = findViewById(R.id.item_list);
+        emptyView = findViewById(R.id.empty_view);
+
+
+        setupRecyclerView(recyclerView);
+
         mDatabaseReference = FirebaseDatabase.getInstance().getReference("Places").child(this.id).child("stories");
         mDatabaseReference.addChildEventListener(new ChildEventListener()
         {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s)
             {
-                DatabaseReference mChildDatabaseReference =
-                        FirebaseDatabase.getInstance().getReference("Stories").child(dataSnapshot.getValue().toString());
+                DatabaseReference mChildDatabaseReference = FirebaseDatabase.getInstance().getReference("Stories").child(dataSnapshot.getValue().toString());
                 mChildDatabaseReference.addValueEventListener(new ValueEventListener()
                 {
                     @Override
@@ -74,45 +77,70 @@ public class StoriesListActivity extends AppCompatActivity
                         Story story = dataSnapshot.getValue(Story.class);
                         stories.add(story);
                         adapter.notifyDataSetChanged();
+                        isEmptyListHandling();
                     }
 
                     @Override
-                    public void onCancelled(DatabaseError databaseError) { }
+                    public void onCancelled(DatabaseError databaseError)
+                    {
+                        Log.i("thomas", "onCancelled");
+                    }
                 });
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
+            public void onChildChanged(DataSnapshot dataSnapshot, String s)
+            {
+            }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot)
             {
                 DatabaseReference mChildDatabaseReference =
                         FirebaseDatabase.getInstance().getReference("Stories").child(dataSnapshot.getValue().toString());
-                mChildDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                mChildDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener()
+                {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+                    public void onDataChange(DataSnapshot dataSnapshot)
+                    {
                         Story story = dataSnapshot.getValue(Story.class);
                         stories.remove(story);
                         adapter.notifyDataSetChanged();
+                        isEmptyListHandling();
                     }
 
                     @Override
-                    public void onCancelled(DatabaseError databaseError) { }
+                    public void onCancelled(DatabaseError databaseError)
+                    {
+                    }
                 });
             }
 
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
+            public void onChildMoved(DataSnapshot dataSnapshot, String s)
+            {
+            }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) { }
+            public void onCancelled(DatabaseError databaseError)
+            {
+            }
         });
+
+        isEmptyListHandling();
+
+
+    }
+
+    private void isEmptyListHandling()
+    {
+        emptyView.setVisibility(stories.isEmpty() ? ImageView.VISIBLE : View.GONE);
+        recyclerView.setVisibility(stories.isEmpty() ? ImageView.GONE : View.VISIBLE);
     }
 
     private void setupRecyclerView(RecyclerView recyclerView)
     {
-        this.adapter = new SimpleItemRecyclerViewAdapter(this, this.stories, isIntwoPanes);
+        this.adapter = new StoriesRecyclerViewAdapter(this, this.stories, isIntwoPanes);
         recyclerView.setAdapter(adapter);
     }
 
