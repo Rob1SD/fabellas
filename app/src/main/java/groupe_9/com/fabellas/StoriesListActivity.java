@@ -2,13 +2,11 @@ package groupe_9.com.fabellas;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,10 +17,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+
 import groupe_9.com.fabellas.adapters.SimpleItemRecyclerViewAdapter;
 import groupe_9.com.fabellas.bo.PlaceTag;
 import groupe_9.com.fabellas.bo.Story;
-import groupe_9.com.fabellas.bo.User;
 import groupe_9.com.fabellas.widget.FabellasAppWidgetProvider;
 
 public class StoriesListActivity extends AppCompatActivity
@@ -31,12 +30,16 @@ public class StoriesListActivity extends AppCompatActivity
     private String title;
     private String id;
     private DatabaseReference mDatabaseReference;
+    private ArrayList<Story> stories;
+    private SimpleItemRecyclerViewAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_place_stories);
+
+        stories = new ArrayList<>();
 
         if ((getIntent() != null))
         {
@@ -50,50 +53,65 @@ public class StoriesListActivity extends AppCompatActivity
             isIntwoPanes = true;
         }
 
-        final View listView = findViewById(R.id.item_list);
-        if (listView != null)
+        final RecyclerView recyclerView = findViewById(R.id.item_list);
+        if (recyclerView != null)
         {
-            setupRecyclerView((RecyclerView) listView);
+            setupRecyclerView(recyclerView);
         }
         mDatabaseReference = FirebaseDatabase.getInstance().getReference("Places").child(this.id).child("stories");
-        mDatabaseReference.addChildEventListener(new ChildEventListener() {
+        mDatabaseReference.addChildEventListener(new ChildEventListener()
+        {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            public void onChildAdded(DataSnapshot dataSnapshot, String s)
+            {
                 DatabaseReference mChildDatabaseReference =
-                    FirebaseDatabase.getInstance().getReference("Stories").child(dataSnapshot.getValue().toString());
-                mChildDatabaseReference.addValueEventListener(new ValueEventListener() {
+                        FirebaseDatabase.getInstance().getReference("Stories").child(dataSnapshot.getValue().toString());
+                mChildDatabaseReference.addValueEventListener(new ValueEventListener()
+                {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+                    public void onDataChange(DataSnapshot dataSnapshot)
+                    {
                         Story story = dataSnapshot.getValue(Story.class);
+                        stories.add(story);
+                        adapter.notifyDataSetChanged();
                         Log.i("StoriesActivity", story.placeId);
                     }
 
                     @Override
-                    public void onCancelled(DatabaseError databaseError) { }
+                    public void onCancelled(DatabaseError databaseError)
+                    {
+                    }
                 });
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            public void onChildChanged(DataSnapshot dataSnapshot, String s)
+            {
 
             }
 
             @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
+            public void onChildRemoved(DataSnapshot dataSnapshot)
+            {
 
             }
 
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
+            public void onChildMoved(DataSnapshot dataSnapshot, String s)
+            {
+            }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) { }
+            public void onCancelled(DatabaseError databaseError)
+            {
+            }
         });
     }
 
     private void setupRecyclerView(RecyclerView recyclerView)
     {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, DummyContent.ITEMS, isIntwoPanes));
+        this.adapter = new SimpleItemRecyclerViewAdapter(this, this.stories, isIntwoPanes);
+        recyclerView.setAdapter(adapter);
     }
 
     @Override

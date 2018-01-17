@@ -9,12 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.List;
+import java.util.ArrayList;
 
-import groupe_9.com.fabellas.DummyContent;
 import groupe_9.com.fabellas.R;
 import groupe_9.com.fabellas.StorieDetailActivity;
 import groupe_9.com.fabellas.StoriesListActivity;
+import groupe_9.com.fabellas.bo.Story;
 import groupe_9.com.fabellas.fragments.StorieDetailFragment;
 
 /**
@@ -26,18 +26,18 @@ public class SimpleItemRecyclerViewAdapter
 {
 
     private final StoriesListActivity mParentActivity;
-    private final List<DummyContent.DummyItem> values;
+    private final ArrayList<Story> stories;
     private final boolean isInTwoPane;
     private final View.OnClickListener mOnClickListener = new View.OnClickListener()
     {
         @Override
         public void onClick(View view)
         {
-            final DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
+            final Story item = (Story) view.getTag();
             if (isInTwoPane)
             {
                 final Bundle arguments = new Bundle();
-                arguments.putString(StorieDetailFragment.ARG_ITEM_ID, item.id);
+                arguments.putString(StorieDetailFragment.ARG_ITEM_ID, item.title);
                 final StorieDetailFragment fragment = new StorieDetailFragment();
                 fragment.setArguments(arguments);
                 mParentActivity.getSupportFragmentManager().beginTransaction()
@@ -48,7 +48,7 @@ public class SimpleItemRecyclerViewAdapter
             {
                 final Context context = view.getContext();
                 final Intent intent = new Intent(context, StorieDetailActivity.class);
-                intent.putExtra(StorieDetailFragment.ARG_ITEM_ID, item.id);
+                intent.putExtra(StorieDetailFragment.ARG_ITEM_ID, item.title);
 
                 context.startActivity(intent);
             }
@@ -56,10 +56,10 @@ public class SimpleItemRecyclerViewAdapter
     };
 
     public SimpleItemRecyclerViewAdapter(StoriesListActivity parent,
-                                         List<DummyContent.DummyItem> items,
+                                         ArrayList<Story> stories,
                                          boolean isInTwoPane)
     {
-        values = items;
+        this.stories = stories;
         mParentActivity = parent;
         this.isInTwoPane = isInTwoPane;
     }
@@ -67,25 +67,24 @@ public class SimpleItemRecyclerViewAdapter
     @Override
     public StorieViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_list_content, parent, false);
+        final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_list_content, parent, false);
         return new StorieViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final StorieViewHolder holder, int position)
     {
-        holder.title.setText(values.get(position).id);
-        holder.content.setText(values.get(position).content);
+        holder.title.setText(stories.get(position).title);
+        holder.content.setText(stories.get(position).detail);
 
-        holder.itemView.setTag(values.get(position));
+        holder.itemView.setTag(stories.get(position));
         holder.itemView.setOnClickListener(mOnClickListener);
     }
 
     @Override
     public int getItemCount()
     {
-        return values.size();
+        return stories.size();
     }
 
     class StorieViewHolder extends RecyclerView.ViewHolder
