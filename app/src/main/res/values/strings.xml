@@ -16,4 +16,5 @@
     <string name="appwidget_text">EXAMPLE</string>
     <string name="configure">Configure</string>
     <string name="add_place_widget">Sélectionner un lieu</string>
+    <string name="list_empty">Aucune anecdote !</string>
 </resources>
