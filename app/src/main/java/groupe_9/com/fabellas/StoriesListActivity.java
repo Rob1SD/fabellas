@@ -74,37 +74,39 @@ public class StoriesListActivity extends AppCompatActivity
                         Story story = dataSnapshot.getValue(Story.class);
                         stories.add(story);
                         adapter.notifyDataSetChanged();
-                        Log.i("StoriesActivity", story.placeId);
                     }
 
                     @Override
-                    public void onCancelled(DatabaseError databaseError)
-                    {
-                    }
+                    public void onCancelled(DatabaseError databaseError) { }
                 });
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s)
-            {
-
-            }
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot)
             {
+                DatabaseReference mChildDatabaseReference =
+                        FirebaseDatabase.getInstance().getReference("Stories").child(dataSnapshot.getValue().toString());
+                mChildDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Story story = dataSnapshot.getValue(Story.class);
+                        stories.remove(story);
+                        adapter.notifyDataSetChanged();
+                    }
 
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) { }
+                });
             }
 
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s)
-            {
-            }
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
 
             @Override
-            public void onCancelled(DatabaseError databaseError)
-            {
-            }
+            public void onCancelled(DatabaseError databaseError) { }
         });
     }
 

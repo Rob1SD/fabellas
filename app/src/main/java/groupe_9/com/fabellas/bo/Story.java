@@ -9,6 +9,7 @@ import com.google.firebase.database.IgnoreExtraProperties;
 @IgnoreExtraProperties
 public class Story {
 
+    public String UID;
     public String detail;
     public String placeId;
     public String title;
@@ -18,11 +19,19 @@ public class Story {
 
     }
 
-    public Story(String detail, String placeId, String title, String userId) {
+    public Story(String UID, String detail, String placeId, String title, String userId) {
+        this.UID = UID;
         this.detail = detail;
         this.placeId = placeId;
         this.title = title;
         this.userId = userId;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Story){
+           return ((Story)obj).UID.equals(UID);
+        }
+        return false;
+    }
 }
