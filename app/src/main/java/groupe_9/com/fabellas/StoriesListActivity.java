@@ -27,6 +27,7 @@ import groupe_9.com.fabellas.bo.PlaceTag;
 import groupe_9.com.fabellas.bo.Story;
 import groupe_9.com.fabellas.fragments.StorieDetailFragment;
 import groupe_9.com.fabellas.utils.OnStoryClickable;
+import groupe_9.com.fabellas.utils.Utils;
 import groupe_9.com.fabellas.widget.FabellasAppWidgetConfigureActivity;
 import groupe_9.com.fabellas.widget.FabellasAppWidgetProvider;
 
@@ -77,13 +78,13 @@ public class StoriesListActivity
 
         setupRecyclerView(recyclerView);
 
-        mDatabaseReference = FirebaseDatabase.getInstance().getReference("Places").child(this.id).child("stories");
+        mDatabaseReference = Utils.getDatabase().getReference("Places").child(this.id).child("stories");
         mDatabaseReference.addChildEventListener(new ChildEventListener()
         {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s)
             {
-                DatabaseReference mChildDatabaseReference = FirebaseDatabase.getInstance().getReference("Stories").child(dataSnapshot.getValue().toString());
+                DatabaseReference mChildDatabaseReference = Utils.getDatabase().getReference("Stories").child(dataSnapshot.getValue().toString());
                 mChildDatabaseReference.addValueEventListener(new ValueEventListener()
                 {
                     @Override
@@ -112,7 +113,7 @@ public class StoriesListActivity
             public void onChildRemoved(DataSnapshot dataSnapshot)
             {
                 DatabaseReference mChildDatabaseReference =
-                        FirebaseDatabase.getInstance().getReference("Stories").child(dataSnapshot.getValue().toString());
+                       Utils.getDatabase().getReference("Stories").child(dataSnapshot.getValue().toString());
                 mChildDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener()
                 {
                     @Override
@@ -280,10 +281,12 @@ public class StoriesListActivity
     private void addNewStory(String title, String details)
     {
         String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        DatabaseReference StoryDatabaseReference = FirebaseDatabase.getInstance().getReference("Stories").push();
+        DatabaseReference StoryDatabaseReference = Utils.getDatabase().getReference("Stories").push();
         StoryDatabaseReference.setValue(new Story(StoryDatabaseReference.getKey(), details, id, title, userUid));
         mDatabaseReference.push().setValue(StoryDatabaseReference.getKey());
-        FirebaseDatabase.getInstance().getReference("Users").child(userUid).child("stories").push().setValue(StoryDatabaseReference.getKey());
+        Utils.getDatabase().getReference("Users").child(userUid).child("stories").push().setValue(StoryDatabaseReference.getKey());
+
+        FabellasAppWidgetProvider.sendRefreshBroadcast(this);
     }
 
     @Override
