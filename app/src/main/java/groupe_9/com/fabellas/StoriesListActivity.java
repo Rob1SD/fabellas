@@ -43,6 +43,7 @@ public class StoriesListActivity
     private RecyclerView recyclerView;
     private TextView emptyView;
     public static final int REQUEST_CODE_FOR_ADD_STORIE_ACTIVITY = 1;
+    private boolean isFromWidget = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -163,7 +164,15 @@ public class StoriesListActivity
         switch (item.getItemId())
         {
             case android.R.id.home:
-                onBackPressed();
+                if (isFromWidget)
+                {
+                    startActivity(new Intent(this, MapActivity.class));
+                    finish();
+                }
+                else
+                {
+                    onBackPressed();
+                }
                 return true;
 
             default:
@@ -195,11 +204,13 @@ public class StoriesListActivity
             switch (intent.getAction())
             {
                 case FabellasAppWidgetProvider.INTENT_FROM_APPWIDGET_TITLE:
+                    isFromWidget = true;
                     placeTag = (PlaceTag) bundle.getSerializable(MapActivity.PLACE);
                     this.title = placeTag.getTitle();
                     this.id = placeTag.getId();
                     break;
                 case FabellasAppWidgetProvider.INTENT_FROM_APPWIDGET_ITEM:
+                    isFromWidget = true;
                     final Story storie = (Story) intent.getSerializableExtra(FabellasAppWidgetProvider.STORIE);
                     final int widgetID = intent.getIntExtra(FabellasAppWidgetProvider.WIDGET_ID, 0);
                     this.id = storie.getPlaceId();

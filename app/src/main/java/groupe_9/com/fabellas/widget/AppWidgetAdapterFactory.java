@@ -148,7 +148,7 @@ public class AppWidgetAdapterFactory
     @Override
     public int getCount()
     {
-        return stories == null ? 0 : stories.size();
+        return stories.isEmpty() ? 0 : stories.size();
     }
 
     @Override
@@ -182,13 +182,14 @@ public class AppWidgetAdapterFactory
     @Override
     public RemoteViews getLoadingView()
     {
-        return null;
+        final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_loading_item);
+        return remoteViews;
     }
 
     @Override
     public int getViewTypeCount()
     {
-        return 1;
+        return stories.isEmpty() ? 0 : 1;
     }
 
     @Override
