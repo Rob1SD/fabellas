@@ -1,4 +1,4 @@
-package groupe_9.com.fabellas.utils;
+package groupe_9.com.fabellas.firebase;
 
 import com.google.firebase.database.FirebaseDatabase;
 

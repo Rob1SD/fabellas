@@ -2,7 +2,6 @@ package groupe_9.com.fabellas.widget;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.AdapterView;
@@ -13,15 +12,14 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-import groupe_9.com.fabellas.MapActivity;
 import groupe_9.com.fabellas.R;
 import groupe_9.com.fabellas.bo.Story;
-import groupe_9.com.fabellas.utils.Utils;
+import groupe_9.com.fabellas.firebase.StoriesFinder;
+import groupe_9.com.fabellas.firebase.Utils;
 
 /**
  * Created by thoma on 15/01/2018.
@@ -118,6 +116,8 @@ public class AppWidgetAdapterFactory
         stories = new ArrayList<>();
         mDatabaseReference = Utils.getDatabase().getReference("Places").child(this.placeID).child("stories");
         mDatabaseReference.addChildEventListener(childEventListener);
+
+
     }
 
     @Override

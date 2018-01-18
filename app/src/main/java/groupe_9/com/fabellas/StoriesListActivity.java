@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -14,26 +13,24 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
 import groupe_9.com.fabellas.adapters.StoriesRecyclerViewAdapter;
 import groupe_9.com.fabellas.bo.PlaceTag;
 import groupe_9.com.fabellas.bo.Story;
+import groupe_9.com.fabellas.firebase.StoriesFinder;
+import groupe_9.com.fabellas.firebase.StoriesFinderCallbacks;
+import groupe_9.com.fabellas.firebase.Utils;
 import groupe_9.com.fabellas.fragments.StorieDetailFragment;
 import groupe_9.com.fabellas.utils.OnStoryClickable;
-import groupe_9.com.fabellas.utils.Utils;
 import groupe_9.com.fabellas.widget.FabellasAppWidgetConfigureActivity;
 import groupe_9.com.fabellas.widget.FabellasAppWidgetProvider;
 
 public class StoriesListActivity
         extends AppCompatActivity
-        implements OnStoryClickable, View.OnClickListener
+        implements OnStoryClickable, View.OnClickListener, StoriesFinderCallbacks
 {
     private boolean isIntwoPanes;
     private String title;
@@ -46,97 +43,6 @@ public class StoriesListActivity
     private ProgressBar loader;
     public static final int REQUEST_CODE_FOR_ADD_STORIE_ACTIVITY = 1;
     private boolean isFromWidget = false;
-
-
-    private ValueEventListener isPlaceInDatabaseListener = new ValueEventListener()
-    {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot)
-        {
-            if (dataSnapshot.exists())
-            {
-                mDatabaseReference = Utils.getDatabase().getReference("Places").child(id).child("stories");
-
-                mDatabaseReference.addChildEventListener(new ChildEventListener()
-                {
-                    @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s)
-                    {
-                        DatabaseReference mChildDatabaseReference = Utils.getDatabase().getReference("Stories").child(dataSnapshot.getValue().toString());
-                        mChildDatabaseReference.addValueEventListener(new ValueEventListener()
-                        {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot)
-                            {
-                                Story story = dataSnapshot.getValue(Story.class);
-                                stories.add(story);
-                                adapter.notifyDataSetChanged();
-                                isEmptyListHandling(false);
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError)
-                            {
-                                Log.i("thomas", "onCancelled");
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onChildChanged(DataSnapshot dataSnapshot, String s)
-                    {
-                    }
-
-                    @Override
-                    public void onChildRemoved(DataSnapshot dataSnapshot)
-                    {
-                        DatabaseReference mChildDatabaseReference =
-                                Utils.getDatabase().getReference("Stories").child(dataSnapshot.getValue().toString());
-                        mChildDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener()
-                        {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot)
-                            {
-                                Story story = dataSnapshot.getValue(Story.class);
-                                stories.remove(story);
-                                adapter.notifyDataSetChanged();
-                                isEmptyListHandling(false);
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError)
-                            {
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onChildMoved(DataSnapshot dataSnapshot, String s)
-                    {
-                        Log.i("thomasecalle", "onChildMoved");
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError)
-                    {
-                        Log.i("thomasecalle", "onCancelled");
-                    }
-                });
-            }
-            else
-            {
-                Log.i("thomasecalle", "Il n'y a pas de places pour cet ID !!");
-                isEmptyListHandling(false);
-            }
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError)
-        {
-
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -171,11 +77,9 @@ public class StoriesListActivity
 
         setupRecyclerView(recyclerView);
 
-        mDatabaseReference = Utils.getDatabase().getReference("Places").child(this.id);
+        final StoriesFinder storiesFinder = new StoriesFinder(this);
 
-        isEmptyListHandling(true);
-        mDatabaseReference.addValueEventListener(isPlaceInDatabaseListener);
-
+        mDatabaseReference = storiesFinder.startToSearch(id);
     }
 
     private void isEmptyListHandling(boolean isLoading)
@@ -325,5 +229,33 @@ public class StoriesListActivity
     public void onPointerCaptureChanged(boolean hasCapture)
     {
 
+    }
+
+    @Override
+    public void onStartLooking()
+    {
+        isEmptyListHandling(true);
+    }
+
+    @Override
+    public void onStorieFound(Story story)
+    {
+        stories.add(story);
+        adapter.notifyDataSetChanged();
+        isEmptyListHandling(false);
+    }
+
+    @Override
+    public void onPlaceNotFound()
+    {
+        isEmptyListHandling(false);
+    }
+
+    @Override
+    public void onStoryRemoved(Story story)
+    {
+        stories.add(story);
+        adapter.notifyDataSetChanged();
+        isEmptyListHandling(false);
     }
 }
