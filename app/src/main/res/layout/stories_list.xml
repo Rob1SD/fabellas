@@ -7,6 +7,14 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <ProgressBar
+        android:id="@+id/loader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="visible"
+        />
+
     <android.support.v7.widget.RecyclerView
 
         android:id="@+id/item_list"
@@ -18,12 +26,14 @@
         app:layoutManager="LinearLayoutManager"
         tools:listitem="@layout/item_list_content"/>
 
+
     <TextView
         android:id="@+id/empty_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:visibility="gone"
-        android:text="@string/no_data_available" />
+        android:text="@string/no_data_available"
+        android:visibility="gone"/>
+
 
 </LinearLayout>

@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -17,7 +18,6 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -43,8 +43,100 @@ public class StoriesListActivity
     private StoriesRecyclerViewAdapter adapter;
     private RecyclerView recyclerView;
     private TextView emptyView;
+    private ProgressBar loader;
     public static final int REQUEST_CODE_FOR_ADD_STORIE_ACTIVITY = 1;
     private boolean isFromWidget = false;
+
+
+    private ValueEventListener isPlaceInDatabaseListener = new ValueEventListener()
+    {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot)
+        {
+            if (dataSnapshot.exists())
+            {
+                mDatabaseReference = Utils.getDatabase().getReference("Places").child(id).child("stories");
+
+                mDatabaseReference.addChildEventListener(new ChildEventListener()
+                {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s)
+                    {
+                        DatabaseReference mChildDatabaseReference = Utils.getDatabase().getReference("Stories").child(dataSnapshot.getValue().toString());
+                        mChildDatabaseReference.addValueEventListener(new ValueEventListener()
+                        {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot)
+                            {
+                                Story story = dataSnapshot.getValue(Story.class);
+                                stories.add(story);
+                                adapter.notifyDataSetChanged();
+                                isEmptyListHandling(false);
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError)
+                            {
+                                Log.i("thomas", "onCancelled");
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s)
+                    {
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot)
+                    {
+                        DatabaseReference mChildDatabaseReference =
+                                Utils.getDatabase().getReference("Stories").child(dataSnapshot.getValue().toString());
+                        mChildDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener()
+                        {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot)
+                            {
+                                Story story = dataSnapshot.getValue(Story.class);
+                                stories.remove(story);
+                                adapter.notifyDataSetChanged();
+                                isEmptyListHandling(false);
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError)
+                            {
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s)
+                    {
+                        Log.i("thomasecalle", "onChildMoved");
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError)
+                    {
+                        Log.i("thomasecalle", "onCancelled");
+                    }
+                });
+            }
+            else
+            {
+                Log.i("thomasecalle", "Il n'y a pas de places pour cet ID !!");
+                isEmptyListHandling(false);
+            }
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError)
+        {
+
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -74,83 +166,23 @@ public class StoriesListActivity
 
         recyclerView = findViewById(R.id.item_list);
         emptyView = findViewById(R.id.empty_view);
+        loader = findViewById(R.id.loader);
 
 
         setupRecyclerView(recyclerView);
 
-        mDatabaseReference = Utils.getDatabase().getReference("Places").child(this.id).child("stories");
-        mDatabaseReference.addChildEventListener(new ChildEventListener()
-        {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s)
-            {
-                DatabaseReference mChildDatabaseReference = Utils.getDatabase().getReference("Stories").child(dataSnapshot.getValue().toString());
-                mChildDatabaseReference.addValueEventListener(new ValueEventListener()
-                {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot)
-                    {
-                        Story story = dataSnapshot.getValue(Story.class);
-                        stories.add(story);
-                        adapter.notifyDataSetChanged();
-                        isEmptyListHandling();
-                    }
+        mDatabaseReference = Utils.getDatabase().getReference("Places").child(this.id);
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError)
-                    {
-                        Log.i("thomas", "onCancelled");
-                    }
-                });
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s)
-            {
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot)
-            {
-                DatabaseReference mChildDatabaseReference =
-                       Utils.getDatabase().getReference("Stories").child(dataSnapshot.getValue().toString());
-                mChildDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener()
-                {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot)
-                    {
-                        Story story = dataSnapshot.getValue(Story.class);
-                        stories.remove(story);
-                        adapter.notifyDataSetChanged();
-                        isEmptyListHandling();
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError)
-                    {
-                    }
-                });
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s)
-            {
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError)
-            {
-            }
-        });
-
-        isEmptyListHandling();
+        isEmptyListHandling(true);
+        mDatabaseReference.addValueEventListener(isPlaceInDatabaseListener);
 
     }
 
-    private void isEmptyListHandling()
+    private void isEmptyListHandling(boolean isLoading)
     {
-        emptyView.setVisibility(stories.isEmpty() ? ImageView.VISIBLE : View.GONE);
-        recyclerView.setVisibility(stories.isEmpty() ? ImageView.GONE : View.VISIBLE);
+        loader.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+        emptyView.setVisibility(stories.isEmpty() && !isLoading ? ImageView.VISIBLE : View.GONE);
+        recyclerView.setVisibility(stories.isEmpty() && !isLoading ? ImageView.GONE : View.VISIBLE);
     }
 
     private void setupRecyclerView(RecyclerView recyclerView)
