@@ -56,6 +56,12 @@ public class StoriesListActivity
             handleIntent(getIntent());
         }
 
+        final ImageView iconImageView = findViewById(R.id.floating_button);
+        iconImageView.setOnClickListener(this);
+
+        iconImageView.setVisibility(FirebaseAuth.getInstance().getCurrentUser().isAnonymous() ? View.GONE : View.VISIBLE);
+
+
         setUpToolbar();
 
         if (findViewById(R.id.item_detail_container) != null)
@@ -168,9 +174,6 @@ public class StoriesListActivity
     {
         final Toolbar toolbar = findViewById(R.id.toolbar);
         final TextView toolbarTitle = toolbar.findViewById(R.id.title);
-
-        final ImageView iconImageView = findViewById(R.id.floating_button);
-        iconImageView.setOnClickListener(this);
 
         toolbarTitle.setText(this.title);
 
