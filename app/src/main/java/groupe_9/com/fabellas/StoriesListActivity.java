@@ -181,8 +181,8 @@ public class StoriesListActivity
     private void isEmptyListHandling(boolean isLoading)
     {
         loader.setVisibility(isLoading ? View.VISIBLE : View.GONE);
-        emptyView.setVisibility(stories.isEmpty() && !isLoading ? ImageView.VISIBLE : View.GONE);
-        recyclerView.setVisibility(stories.isEmpty() && !isLoading ? ImageView.GONE : View.VISIBLE);
+        emptyView.setVisibility(stories.isEmpty() && !isLoading ? View.VISIBLE : View.GONE);
+        recyclerView.setVisibility(stories.isEmpty() && !isLoading ? View.GONE : View.VISIBLE);
     }
 
     private void setupRecyclerView(RecyclerView recyclerView)
