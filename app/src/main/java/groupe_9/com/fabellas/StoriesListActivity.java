@@ -35,7 +35,7 @@ public class StoriesListActivity extends AppCompatActivity implements View.OnCli
     private StoriesRecyclerViewAdapter adapter;
     private RecyclerView recyclerView;
     private TextView emptyView;
-
+    public static final int REQUEST_CODE_FOR_ADD_STORIE_ACTIVITY = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -200,14 +200,18 @@ public class StoriesListActivity extends AppCompatActivity implements View.OnCli
         {
             Log.i(MapActivity.TAG, String.format("PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS "));
             Intent intent = new Intent(this,AddStorieActivity.class);
-            startActivityForResult(intent, 1);
+            startActivityForResult(intent, REQUEST_CODE_FOR_ADD_STORIE_ACTIVITY);
         }
     }
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        String title = data.getStringExtra(AddStorieActivity.TITLE_VALUE);
-        String details = data.getStringExtra(AddStorieActivity.DETAILS_VALUE);
-        Toast.makeText(this,"title :  => " + title + "\nDetails : " + details,Toast.LENGTH_SHORT).show();
+        if (REQUEST_CODE_FOR_ADD_STORIE_ACTIVITY == requestCode && RESULT_OK == resultCode)
+        {
+            String title = data.getStringExtra(AddStorieActivity.TITLE_VALUE);
+            String details = data.getStringExtra(AddStorieActivity.DETAILS_VALUE);
+            Toast.makeText(this,"title :  => " + title + "\nDetails : " + details,Toast.LENGTH_SHORT).show();
+
+        }
 
     }
     @Override
