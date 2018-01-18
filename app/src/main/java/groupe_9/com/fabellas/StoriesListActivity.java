@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -25,8 +26,7 @@ import groupe_9.com.fabellas.bo.PlaceTag;
 import groupe_9.com.fabellas.bo.Story;
 import groupe_9.com.fabellas.widget.FabellasAppWidgetProvider;
 
-public class StoriesListActivity extends AppCompatActivity
-{
+public class StoriesListActivity extends AppCompatActivity implements View.OnClickListener {
     private boolean isIntwoPanes;
     private String title;
     private String id;
@@ -128,6 +128,7 @@ public class StoriesListActivity extends AppCompatActivity
         });
 
         isEmptyListHandling();
+        (findViewById(R.id.icon)).setOnClickListener(this);
 
 
     }
@@ -192,5 +193,25 @@ public class StoriesListActivity extends AppCompatActivity
     {
         this.title = title;
         this.id = id;
+    }
+
+    public void onClick(View v) {
+        if (v.getId() == R.id.icon)
+        {
+            Log.i(MapActivity.TAG, String.format("PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS "));
+            Intent intent = new Intent(this,AddStorieActivity.class);
+            startActivityForResult(intent, 1);
+        }
+    }
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        String title = data.getStringExtra(AddStorieActivity.TITLE_VALUE);
+        String details = data.getStringExtra(AddStorieActivity.DETAILS_VALUE);
+        Toast.makeText(this,"title :  => " + title + "\nDetails : " + details,Toast.LENGTH_SHORT).show();
+
+    }
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+
     }
 }

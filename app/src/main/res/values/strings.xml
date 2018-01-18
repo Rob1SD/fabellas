@@ -18,4 +18,7 @@
     <string name="add_place_widget">Sélectionner un lieu</string>
     <string name="list_empty">Aucune anecdote !</string>
     <string name="no_data_available">Aucune Anecdote renseignée.</string>
+    <string name="validate_add_storie">Ajouter l\'anecdote</string>
+    <string name="storie_title">Titre de l\'anecdote</string>
+    <string name="storie_details">Description de  l\'anecdote</string>
 </resources>
