@@ -3,17 +3,19 @@ package groupe_9.com.fabellas.widget;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.TaskStackBuilder;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import groupe_9.com.fabellas.MapActivity;
 import groupe_9.com.fabellas.R;
 import groupe_9.com.fabellas.StoriesListActivity;
 import groupe_9.com.fabellas.bo.PlaceTag;
+import groupe_9.com.fabellas.bo.Story;
 
 /**
  * Implementation of App Widget functionality.
@@ -21,9 +23,11 @@ import groupe_9.com.fabellas.bo.PlaceTag;
  */
 public class FabellasAppWidgetProvider extends AppWidgetProvider
 {
-
-    public static final String APPWIDGET_TITLE_EXTRA = "appWidgetTitleExtra";
     public static final String APPWIDGET_PLACE_ID_EXTRA = "appWidgetPlaceIdExtra";
+    public static final String APPWIDGET_PLACE_NAME = "appWidgetPlaceName";
+    public static final String WIDGET_ID = "widgetID";
+    public static final String INTENT_FROM_APPWIDGET_TITLE = "intentFromAppWidgetAction";
+    public static final String INTENT_FROM_APPWIDGET_ITEM = "intentFromAppWidgetItemAction";
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId)
     {
@@ -37,16 +41,20 @@ public class FabellasAppWidgetProvider extends AppWidgetProvider
         views.setOnClickPendingIntent(R.id.appwidget_title, titlePendingIntent);
 
         final Intent intent = new Intent(context, WidgetRemoteViewsService.class);
+        intent.putExtra(APPWIDGET_PLACE_ID_EXTRA, placeID);
+        intent.putExtra(WIDGET_ID, appWidgetId);
         views.setRemoteAdapter(R.id.list, intent);
 
 
         // template to handle the click listener for each item
-        final Intent clickIntentTemplate = new Intent(context, StoriesListActivity.class);
-        final PendingIntent clickPendingIntentTemplate = TaskStackBuilder.create(context)
-                .addNextIntentWithParentStack(clickIntentTemplate)
-                .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        final Intent clickIntentTemplate = new Intent(context, FabellasAppWidgetProvider.class);
+        clickIntentTemplate.putExtra(APPWIDGET_PLACE_NAME, placeName);
 
-        views.setPendingIntentTemplate(R.id.list, clickPendingIntentTemplate);
+        final PendingIntent onClickPendingIntent = PendingIntent
+                .getBroadcast(context, 0, clickIntentTemplate,
+                        PendingIntent.FLAG_UPDATE_CURRENT);
+
+        views.setPendingIntentTemplate(R.id.list, onClickPendingIntent);
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 
@@ -83,12 +91,41 @@ public class FabellasAppWidgetProvider extends AppWidgetProvider
         // Enter relevant functionality for when the last widget is disabled
     }
 
+    public static void sendRefreshBroadcast(Context context)
+    {
+        final Intent intent = new Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        intent.setComponent(new ComponentName(context, FabellasAppWidgetProvider.class));
+        context.sendBroadcast(intent);
+    }
+
+
+    @Override
+    public void onReceive(final Context context, Intent intent)
+    {
+        final String action = intent.getAction();
+
+        switch (action)
+        {
+            case INTENT_FROM_APPWIDGET_ITEM:
+                final Story storie = (Story) intent.getSerializableExtra("thomas");
+                Log.i("thomasecalle", "clicked on widget storie : " + storie.getTitle());
+                break;
+            case AppWidgetManager.ACTION_APPWIDGET_UPDATE:
+                final AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+                final ComponentName cn = new ComponentName(context, FabellasAppWidgetProvider.class);
+                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetManager.getAppWidgetIds(cn), R.id.list);
+                break;
+        }
+        super.onReceive(context, intent);
+    }
+
     private static PendingIntent clickOnTitleIntent(Context context, String placeName, String placeID, int appWidgetId)
     {
         final Intent titleIntent = new Intent(context, StoriesListActivity.class);
-        titleIntent.putExtra(FabellasAppWidgetProvider.APPWIDGET_TITLE_EXTRA, placeName);
+        titleIntent.setAction(INTENT_FROM_APPWIDGET_TITLE);
         final Bundle bundle = new Bundle();
-        bundle.putSerializable(MapActivity.PLACE_ID, new PlaceTag(placeName, placeID));
+        bundle.putSerializable(MapActivity.PLACE, new PlaceTag(placeName, placeID));
+
         titleIntent.putExtras(bundle);
         titleIntent.setData(Uri.withAppendedPath(Uri.parse("myapp://widget/id/#togetituniqie" + appWidgetId), String.valueOf(appWidgetId)));
 

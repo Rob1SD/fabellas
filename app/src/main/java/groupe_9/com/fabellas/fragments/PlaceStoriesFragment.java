@@ -27,10 +27,10 @@ public class PlaceStoriesFragment extends Fragment
         final Bundle bundle = getArguments();
         if (bundle != null)
         {
-            if (bundle.getSerializable(MapActivity.PLACE_ID) != null)
+            if (bundle.getSerializable(MapActivity.PLACE) != null)
             {
-                this.placeID = ((PlaceTag) bundle.getSerializable(MapActivity.PLACE_ID)).getId();
-                this.placeName = ((PlaceTag) bundle.getSerializable(MapActivity.PLACE_ID)).getTitle();
+                this.placeID = ((PlaceTag) bundle.getSerializable(MapActivity.PLACE)).getId();
+                this.placeName = ((PlaceTag) bundle.getSerializable(MapActivity.PLACE)).getTitle();
                 ((TextView) view.findViewById(R.id.name)).setText(this.placeName);
                 ((TextView) view.findViewById(R.id.id)).setText(this.placeID);
             }

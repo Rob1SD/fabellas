@@ -39,7 +39,7 @@ public class StorieDetailFragment extends Fragment
 
         if (storie != null)
         {
-            ((TextView) rootView.findViewById(R.id.storie_detail)).setText(storie.detail);
+            ((TextView) rootView.findViewById(R.id.storie_detail)).setText(storie.getDetail());
         }
 
         return rootView;

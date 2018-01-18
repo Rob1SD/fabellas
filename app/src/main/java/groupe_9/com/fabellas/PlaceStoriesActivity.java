@@ -31,7 +31,7 @@ public class PlaceStoriesActivity
             if ((getIntent().getExtras() != null))
             {
                 final Bundle extras = getIntent().getExtras();
-                this.title = ((PlaceTag) extras.getSerializable(MapActivity.PLACE_ID)).getTitle();
+                this.title = ((PlaceTag) extras.getSerializable(MapActivity.PLACE)).getTitle();
                 final FragmentManager supportFragmentManager = getSupportFragmentManager();
                 final FragmentTransaction fragmentTransaction = supportFragmentManager.beginTransaction();
                 final PlaceStoriesFragment placeStoriesFragment = new PlaceStoriesFragment();

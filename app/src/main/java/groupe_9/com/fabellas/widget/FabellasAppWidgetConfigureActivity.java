@@ -47,7 +47,7 @@ public class FabellasAppWidgetConfigureActivity
                     Log.i(MapActivity.TAG, "Place Searched on widget configure activity: " + place.getName());
 
                     saveTitlePref(this, mAppWidgetId, place.getName().toString());
-                    saveIDPref(this, mAppWidgetId, place.getName().toString());
+                    saveIDPref(this, mAppWidgetId, place.getId());
 
                     // It is the responsibility of the configuration activity to update the app widget
                     AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);

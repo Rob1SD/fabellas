@@ -1,8 +1,5 @@
 package groupe_9.com.fabellas.adapters;
 
-import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,10 +9,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import groupe_9.com.fabellas.R;
-import groupe_9.com.fabellas.StorieDetailActivity;
-import groupe_9.com.fabellas.StoriesListActivity;
 import groupe_9.com.fabellas.bo.Story;
-import groupe_9.com.fabellas.fragments.StorieDetailFragment;
+import groupe_9.com.fabellas.utils.OnStoryClickable;
 
 /**
  * Created by thoma on 15/01/2018.
@@ -25,7 +20,7 @@ public class StoriesRecyclerViewAdapter
         extends RecyclerView.Adapter<StoriesRecyclerViewAdapter.StorieViewHolder>
 {
 
-    private final StoriesListActivity mParentActivity;
+    private final OnStoryClickable mParentActivity;
     private final ArrayList<Story> stories;
     private final boolean isInTwoPane;
     private final View.OnClickListener mOnClickListener = new View.OnClickListener()
@@ -34,28 +29,11 @@ public class StoriesRecyclerViewAdapter
         public void onClick(View view)
         {
             final Story storie = (Story) view.getTag();
-            if (isInTwoPane)
-            {
-                final Bundle arguments = new Bundle();
-                arguments.putSerializable(StorieDetailFragment.STORIE_EXTRA, storie);
-
-                final StorieDetailFragment fragment = new StorieDetailFragment();
-                fragment.setArguments(arguments);
-                mParentActivity.getSupportFragmentManager().beginTransaction().replace(R.id.item_detail_container, fragment)
-                        .commit();
-            }
-            else
-            {
-                final Context context = view.getContext();
-                final Intent intent = new Intent(context, StorieDetailActivity.class);
-                intent.putExtra(StorieDetailFragment.STORIE_EXTRA, storie);
-
-                context.startActivity(intent);
-            }
+            mParentActivity.clickedOnStory(storie);
         }
     };
 
-    public StoriesRecyclerViewAdapter(StoriesListActivity parent,
+    public StoriesRecyclerViewAdapter(OnStoryClickable parent,
                                       ArrayList<Story> stories,
                                       boolean isInTwoPane)
     {
@@ -74,8 +52,8 @@ public class StoriesRecyclerViewAdapter
     @Override
     public void onBindViewHolder(final StorieViewHolder holder, int position)
     {
-        holder.title.setText(stories.get(position).title);
-        holder.content.setText(stories.get(position).detail);
+        holder.title.setText(stories.get(position).getTitle());
+        holder.content.setText(stories.get(position).getDetail());
 
         holder.itemView.setTag(stories.get(position));
         holder.itemView.setOnClickListener(mOnClickListener);

@@ -19,7 +19,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.firebase.ui.auth.data.model.User;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -71,8 +70,9 @@ public class MapActivity
     public static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 3000;
 
 
-    public static final String PLACE_ID = "placeID";
+    public static final String PLACE = "placeID";
     public static final String TAG = "thomasecalle";
+    public static final String INTENT_FROM_MAP_ACTIVITY = "intentFromMapActivity";
 
     private GoogleMap googleMap;
     private String currentPlaceID;
@@ -111,7 +111,8 @@ public class MapActivity
     protected void onResume()
     {
         super.onResume();
-        if(null == FirebaseAuth.getInstance().getCurrentUser()){
+        if (null == FirebaseAuth.getInstance().getCurrentUser())
+        {
             startActivity(new Intent(this, ConnectionActivity.class));
             finish();
         }
@@ -178,8 +179,9 @@ public class MapActivity
     {
         //Toast.makeText(this, "Marker id : " + marker.getTag(), Toast.LENGTH_LONG).show();
         final Intent intent = new Intent(this, StoriesListActivity.class);
+        intent.setAction(INTENT_FROM_MAP_ACTIVITY);
         final Bundle bundle = new Bundle();
-        bundle.putSerializable(MapActivity.PLACE_ID, (PlaceTag) marker.getTag());
+        bundle.putSerializable(MapActivity.PLACE, (PlaceTag) marker.getTag());
         intent.putExtras(bundle);
 
         startActivity(intent);
@@ -307,7 +309,8 @@ public class MapActivity
             case R.id.icon_logout:
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 FirebaseAuth.getInstance().signOut();
-                if(user.isAnonymous()) {
+                if (user.isAnonymous())
+                {
                     user.delete();
                 }
                 startActivity(new Intent(this, ConnectionActivity.class));

@@ -27,7 +27,7 @@ public class StorieDetailActivity extends AppCompatActivity
         if (getIntent() != null && getIntent().getSerializableExtra(StorieDetailFragment.STORIE_EXTRA) != null)
         {
             this.storie = (Story) getIntent().getSerializableExtra(StorieDetailFragment.STORIE_EXTRA);
-            this.title = storie.title;
+            this.title = storie.getTitle();
             arguments.putSerializable(StorieDetailFragment.STORIE_EXTRA, storie);
             final StorieDetailFragment fragment = new StorieDetailFragment();
             fragment.setArguments(arguments);
