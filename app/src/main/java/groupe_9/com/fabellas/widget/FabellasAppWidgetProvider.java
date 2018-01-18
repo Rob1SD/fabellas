@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -15,7 +16,6 @@ import groupe_9.com.fabellas.MapActivity;
 import groupe_9.com.fabellas.R;
 import groupe_9.com.fabellas.StoriesListActivity;
 import groupe_9.com.fabellas.bo.PlaceTag;
-import groupe_9.com.fabellas.bo.Story;
 
 /**
  * Implementation of App Widget functionality.
@@ -47,14 +47,19 @@ public class FabellasAppWidgetProvider extends AppWidgetProvider
 
 
         // template to handle the click listener for each item
-        final Intent clickIntentTemplate = new Intent(context, FabellasAppWidgetProvider.class);
-        clickIntentTemplate.putExtra(APPWIDGET_PLACE_NAME, placeName);
+        final Intent clickIntent = new Intent(context, StoriesListActivity.class);
+        // Set the action for the intent.
+        // When the user touches a particular view, it will have the effect of
+        // broadcasting TOAST_ACTION.
+        clickIntent.setAction(INTENT_FROM_APPWIDGET_ITEM);
+        //clickIntent.putExtra(APPWIDGET_PLACE_NAME, placeName);
+        //clickIntent.setData(Uri.parse("myapp://widget/id/#togetituniqie" + appWidgetId));
+        final PendingIntent clickPendingIntentTemplate = TaskStackBuilder.create(context)
+                .addNextIntentWithParentStack(clickIntent)
+                .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        final PendingIntent onClickPendingIntent = PendingIntent
-                .getBroadcast(context, 0, clickIntentTemplate,
-                        PendingIntent.FLAG_UPDATE_CURRENT);
 
-        views.setPendingIntentTemplate(R.id.list, onClickPendingIntent);
+        //views.setPendingIntentTemplate(R.id.list, clickPendingIntentTemplate);
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 
@@ -107,8 +112,8 @@ public class FabellasAppWidgetProvider extends AppWidgetProvider
         switch (action)
         {
             case INTENT_FROM_APPWIDGET_ITEM:
-                final Story storie = (Story) intent.getSerializableExtra("thomas");
-                Log.i("thomasecalle", "clicked on widget storie : " + storie.getTitle());
+                final String test = intent.getStringExtra("thomas");
+                Log.i("thomasecalle", "clicked on widget storie : " + test);
                 break;
             case AppWidgetManager.ACTION_APPWIDGET_UPDATE:
                 final AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);

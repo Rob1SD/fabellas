@@ -199,11 +199,11 @@ public class StoriesListActivity
                     this.id = placeTag.getId();
                     break;
                 case FabellasAppWidgetProvider.INTENT_FROM_APPWIDGET_ITEM:
-                    final Story storie = (Story) intent.getSerializableExtra(MapActivity.PLACE);
+                    final String test =  intent.getExtras().getString("thomas");
                     final String title = intent.getStringExtra(FabellasAppWidgetProvider.APPWIDGET_PLACE_NAME);
-                    this.id = storie.getPlaceId();
+                    //this.id = storie.getPlaceId();
                     this.title = title;
-                    clickedOnStory(storie);
+                    //clickedOnStory(storie);
                     break;
 
                 case MapActivity.INTENT_FROM_MAP_ACTIVITY:

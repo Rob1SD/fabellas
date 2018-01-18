@@ -2,6 +2,8 @@ package groupe_9.com.fabellas.widget;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
 import android.util.Log;
 import android.widget.AdapterView;
 import android.widget.RemoteViews;
@@ -16,7 +18,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-import groupe_9.com.fabellas.MapActivity;
 import groupe_9.com.fabellas.R;
 import groupe_9.com.fabellas.bo.Story;
 
@@ -32,6 +33,75 @@ public class AppWidgetAdapterFactory
     private int widgetID;
     private Context context;
     private DatabaseReference mDatabaseReference;
+    private DatabaseReference mStoriesReference;
+
+    private ValueEventListener addValueEventListener = new ValueEventListener()
+    {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot)
+        {
+            final Story story = dataSnapshot.getValue(Story.class);
+            stories.add(story);
+            Log.i("thomasecalle", "Widget, onDataChanged, get story : " + story.getTitle());
+            FabellasAppWidgetProvider.sendRefreshBroadcast(context);
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError)
+        {
+            Log.i("thomas", "onCancelled");
+        }
+    };
+
+    private ValueEventListener removeValueEventListener = new ValueEventListener()
+    {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot)
+        {
+            Story story = dataSnapshot.getValue(Story.class);
+            stories.remove(story);
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError)
+        {
+        }
+    };
+
+    private ChildEventListener childEventListener = new ChildEventListener()
+    {
+
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s)
+        {
+            mStoriesReference = FirebaseDatabase.getInstance().getReference("Stories").child(dataSnapshot.getValue().toString());
+            mStoriesReference.addValueEventListener(addValueEventListener);
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s)
+        {
+        }
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot)
+        {
+            mStoriesReference = FirebaseDatabase.getInstance().getReference("Stories").child(dataSnapshot.getValue().toString());
+            mStoriesReference.addListenerForSingleValueEvent(removeValueEventListener);
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s)
+        {
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError)
+        {
+        }
+
+    };
+
 
     public AppWidgetAdapterFactory(Context context, Intent intent)
     {
@@ -46,67 +116,7 @@ public class AppWidgetAdapterFactory
     {
         stories = new ArrayList<>();
         mDatabaseReference = FirebaseDatabase.getInstance().getReference("Places").child(this.placeID).child("stories");
-        mDatabaseReference.addChildEventListener(new ChildEventListener()
-        {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s)
-            {
-                DatabaseReference mChildDatabaseReference = FirebaseDatabase.getInstance().getReference("Stories").child(dataSnapshot.getValue().toString());
-                mChildDatabaseReference.addValueEventListener(new ValueEventListener()
-                {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot)
-                    {
-                        final Story story = dataSnapshot.getValue(Story.class);
-                        stories.add(story);
-                        Log.i("thomasecalle", "Widget, onDataChanged, get story : " + story.getTitle());
-                        FabellasAppWidgetProvider.sendRefreshBroadcast(context);
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError)
-                    {
-                        Log.i("thomas", "onCancelled");
-                    }
-                });
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s)
-            {
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot)
-            {
-                DatabaseReference mChildDatabaseReference =
-                        FirebaseDatabase.getInstance().getReference("Stories").child(dataSnapshot.getValue().toString());
-                mChildDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener()
-                {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot)
-                    {
-                        Story story = dataSnapshot.getValue(Story.class);
-                        stories.remove(story);
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError)
-                    {
-                    }
-                });
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s)
-            {
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError)
-            {
-            }
-        });
+        mDatabaseReference.addChildEventListener(childEventListener);
     }
 
     @Override
@@ -121,6 +131,15 @@ public class AppWidgetAdapterFactory
         if (stories != null)
         {
             stories = null;
+        }
+        if (mDatabaseReference != null)
+        {
+            if (mStoriesReference != null)
+            {
+                mStoriesReference.removeEventListener(addValueEventListener);
+                mStoriesReference.removeEventListener(removeValueEventListener);
+            }
+            mDatabaseReference.removeEventListener(childEventListener);
         }
 
     }
@@ -143,10 +162,13 @@ public class AppWidgetAdapterFactory
         remoteViews.setTextViewText(R.id.title, stories.get(position).getTitle());
         remoteViews.setTextViewText(R.id.details, stories.get(position).getDetail());
 
-        final Intent fillInIntent = new Intent(FabellasAppWidgetProvider.INTENT_FROM_APPWIDGET_ITEM);
-
-        //fillInIntent.putExtra(MapActivity.PLACE, stories.get(position));
-        fillInIntent.putExtra("thomas", stories.get(position));
+        // Next, set a fill-intent, which will be used to fill in the pending intent template
+        // that is set on the collection view in StackWidgetProvider.
+        final Bundle extras = new Bundle();
+        extras.putString("thomas", stories.get(position).getUID());
+        final Intent fillInIntent = new Intent();
+        //fillInIntent.setData(Uri.parse("myapp://widget/id/" + widgetID));
+        fillInIntent.putExtras(extras);
 
         remoteViews.setOnClickFillInIntent(R.id.widget_item_container, fillInIntent);
 

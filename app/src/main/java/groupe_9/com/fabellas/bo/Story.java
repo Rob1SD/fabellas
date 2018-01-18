@@ -44,6 +44,16 @@ public class Story implements Serializable
         return false;
     }
 
+    public String getUID()
+    {
+        return UID;
+    }
+
+    public void setUID(String UID)
+    {
+        this.UID = UID;
+    }
+
     public String getPlaceId()
     {
         return placeId;
