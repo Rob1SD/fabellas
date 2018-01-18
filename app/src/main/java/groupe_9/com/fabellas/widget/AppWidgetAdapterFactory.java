@@ -18,6 +18,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
+import groupe_9.com.fabellas.MapActivity;
 import groupe_9.com.fabellas.R;
 import groupe_9.com.fabellas.bo.Story;
 
@@ -166,9 +167,11 @@ public class AppWidgetAdapterFactory
         // that is set on the collection view in StackWidgetProvider.
         final Bundle extras = new Bundle();
         extras.putString("thomas", stories.get(position).getUID());
-        final Intent fillInIntent = new Intent();
         //fillInIntent.setData(Uri.parse("myapp://widget/id/" + widgetID));
-        fillInIntent.putExtras(extras);
+
+        Intent fillInIntent = new Intent(FabellasAppWidgetProvider.INTENT_FROM_APPWIDGET_ITEM);
+        fillInIntent.putExtra(FabellasAppWidgetProvider.STORIE, stories.get(position));
+        fillInIntent.putExtra(FabellasAppWidgetProvider.WIDGET_ID, widgetID);
 
         remoteViews.setOnClickFillInIntent(R.id.widget_item_container, fillInIntent);
 

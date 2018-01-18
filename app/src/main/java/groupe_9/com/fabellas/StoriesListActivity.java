@@ -27,6 +27,7 @@ import groupe_9.com.fabellas.bo.PlaceTag;
 import groupe_9.com.fabellas.bo.Story;
 import groupe_9.com.fabellas.fragments.StorieDetailFragment;
 import groupe_9.com.fabellas.utils.OnStoryClickable;
+import groupe_9.com.fabellas.widget.FabellasAppWidgetConfigureActivity;
 import groupe_9.com.fabellas.widget.FabellasAppWidgetProvider;
 
 public class StoriesListActivity
@@ -199,11 +200,11 @@ public class StoriesListActivity
                     this.id = placeTag.getId();
                     break;
                 case FabellasAppWidgetProvider.INTENT_FROM_APPWIDGET_ITEM:
-                    final String test =  intent.getExtras().getString("thomas");
-                    final String title = intent.getStringExtra(FabellasAppWidgetProvider.APPWIDGET_PLACE_NAME);
-                    //this.id = storie.getPlaceId();
-                    this.title = title;
-                    //clickedOnStory(storie);
+                    final Story storie = (Story) intent.getSerializableExtra(FabellasAppWidgetProvider.STORIE);
+                    final int widgetID = intent.getIntExtra(FabellasAppWidgetProvider.WIDGET_ID, 0);
+                    this.id = storie.getPlaceId();
+                    this.title = FabellasAppWidgetConfigureActivity.loadTitlePref(this, widgetID);
+                    clickedOnStory(storie);
                     break;
 
                 case MapActivity.INTENT_FROM_MAP_ACTIVITY:

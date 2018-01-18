@@ -28,6 +28,7 @@ public class FabellasAppWidgetProvider extends AppWidgetProvider
     public static final String WIDGET_ID = "widgetID";
     public static final String INTENT_FROM_APPWIDGET_TITLE = "intentFromAppWidgetAction";
     public static final String INTENT_FROM_APPWIDGET_ITEM = "intentFromAppWidgetItemAction";
+    public static final String STORIE = "storie";
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId)
     {
@@ -47,19 +48,15 @@ public class FabellasAppWidgetProvider extends AppWidgetProvider
 
 
         // template to handle the click listener for each item
-        final Intent clickIntent = new Intent(context, StoriesListActivity.class);
-        // Set the action for the intent.
-        // When the user touches a particular view, it will have the effect of
-        // broadcasting TOAST_ACTION.
-        clickIntent.setAction(INTENT_FROM_APPWIDGET_ITEM);
         //clickIntent.putExtra(APPWIDGET_PLACE_NAME, placeName);
         //clickIntent.setData(Uri.parse("myapp://widget/id/#togetituniqie" + appWidgetId));
-        final PendingIntent clickPendingIntentTemplate = TaskStackBuilder.create(context)
-                .addNextIntentWithParentStack(clickIntent)
+        Intent clickIntentTemplate = new Intent(context, StoriesListActivity.class);
+        //clickIntentTemplate.putExtra(APPWIDGET_PLACE_NAME, placeName);
+        PendingIntent clickPendingIntentTemplate = TaskStackBuilder.create(context)
+                .addNextIntentWithParentStack(clickIntentTemplate)
                 .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
-
-        //views.setPendingIntentTemplate(R.id.list, clickPendingIntentTemplate);
+        views.setPendingIntentTemplate(R.id.list, clickPendingIntentTemplate);
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 
@@ -111,10 +108,6 @@ public class FabellasAppWidgetProvider extends AppWidgetProvider
 
         switch (action)
         {
-            case INTENT_FROM_APPWIDGET_ITEM:
-                final String test = intent.getStringExtra("thomas");
-                Log.i("thomasecalle", "clicked on widget storie : " + test);
-                break;
             case AppWidgetManager.ACTION_APPWIDGET_UPDATE:
                 final AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
                 final ComponentName cn = new ComponentName(context, FabellasAppWidgetProvider.class);
