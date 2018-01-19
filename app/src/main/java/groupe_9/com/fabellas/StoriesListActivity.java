@@ -18,7 +18,6 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -26,6 +25,7 @@ import java.util.ArrayList;
 import groupe_9.com.fabellas.adapters.StoriesRecyclerViewAdapter;
 import groupe_9.com.fabellas.bo.PlaceTag;
 import groupe_9.com.fabellas.bo.Story;
+import groupe_9.com.fabellas.firebase.Utils;
 import groupe_9.com.fabellas.fragments.StorieDetailFragment;
 import groupe_9.com.fabellas.utils.OnStoryClickable;
 import groupe_9.com.fabellas.widget.FabellasAppWidgetConfigureActivity;
@@ -220,10 +220,10 @@ public class StoriesListActivity
     private void addNewStory(String title, String details)
     {
         String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        DatabaseReference StoryDatabaseReference = FirebaseDatabase.getInstance().getReference("Stories").push();
+        DatabaseReference StoryDatabaseReference = Utils.getDatabase().getReference("Stories").push();
         StoryDatabaseReference.setValue(new Story(StoryDatabaseReference.getKey(), details, id, title, userUid));
         mDatabaseReference.push().setValue(StoryDatabaseReference.getKey());
-        FirebaseDatabase.getInstance().getReference("Users").child(userUid).child("stories").push().setValue(StoryDatabaseReference.getKey());
+        Utils.getDatabase().getReference("Users").child(userUid).child("stories").push().setValue(StoryDatabaseReference.getKey());
     }
 
     @Override
@@ -236,7 +236,7 @@ public class StoriesListActivity
     {
         isEmptyListHandling(true);
 
-        mDatabaseReference = FirebaseDatabase.getInstance().getReference("Places").child(this.id);
+        mDatabaseReference = Utils.getDatabase().getReference("Places").child(this.id);
 
         mDatabaseReference.addValueEventListener(new ValueEventListener()
         {
@@ -257,7 +257,7 @@ public class StoriesListActivity
         });
 
 
-        mDatabaseReference = FirebaseDatabase.getInstance().getReference("Places").child(this.id).child("stories");
+        mDatabaseReference = Utils.getDatabase().getReference("Places").child(this.id).child("stories");
 
 
         mDatabaseReference.addChildEventListener(new ChildEventListener()
@@ -265,7 +265,7 @@ public class StoriesListActivity
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s)
             {
-                DatabaseReference mChildDatabaseReference = FirebaseDatabase.getInstance().getReference("Stories").child(dataSnapshot.getValue().toString());
+                DatabaseReference mChildDatabaseReference = Utils.getDatabase().getReference("Stories").child(dataSnapshot.getValue().toString());
                 mChildDatabaseReference.addValueEventListener(new ValueEventListener()
                 {
                     @Override
@@ -293,8 +293,7 @@ public class StoriesListActivity
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot)
             {
-                DatabaseReference mChildDatabaseReference =
-                        FirebaseDatabase.getInstance().getReference("Stories").child(dataSnapshot.getValue().toString());
+                DatabaseReference mChildDatabaseReference = Utils.getDatabase().getReference("Stories").child(dataSnapshot.getValue().toString());
                 mChildDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener()
                 {
                     @Override

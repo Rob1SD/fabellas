@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import groupe_9.com.fabellas.MapActivity;
 import groupe_9.com.fabellas.R;
 import groupe_9.com.fabellas.bo.Story;
+import groupe_9.com.fabellas.firebase.Utils;
 
 /**
  * Created by thoma on 15/01/2018.
@@ -75,7 +76,7 @@ public class AppWidgetAdapterFactory
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s)
         {
-            mStoriesReference = FirebaseDatabase.getInstance().getReference("Stories").child(dataSnapshot.getValue().toString());
+            mStoriesReference = Utils.getDatabase().getReference("Stories").child(dataSnapshot.getValue().toString());
             mStoriesReference.addValueEventListener(addValueEventListener);
         }
 
@@ -87,7 +88,7 @@ public class AppWidgetAdapterFactory
         @Override
         public void onChildRemoved(DataSnapshot dataSnapshot)
         {
-            mStoriesReference = FirebaseDatabase.getInstance().getReference("Stories").child(dataSnapshot.getValue().toString());
+            mStoriesReference = Utils.getDatabase().getReference("Stories").child(dataSnapshot.getValue().toString());
             mStoriesReference.addListenerForSingleValueEvent(removeValueEventListener);
         }
 
@@ -116,7 +117,7 @@ public class AppWidgetAdapterFactory
     public void onCreate()
     {
         stories = new ArrayList<>();
-        mDatabaseReference = FirebaseDatabase.getInstance().getReference("Places").child(this.placeID).child("stories");
+        mDatabaseReference = Utils.getDatabase().getReference("Places").child(this.placeID).child("stories");
         mDatabaseReference.addChildEventListener(childEventListener);
     }
 

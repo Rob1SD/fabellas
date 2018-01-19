@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import groupe_9.com.fabellas.bo.User;
+import groupe_9.com.fabellas.firebase.Utils;
 
 public class ConnectionActivity extends AppCompatActivity {
 
@@ -44,7 +45,7 @@ public class ConnectionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connection);
         mAuth = FirebaseAuth.getInstance();
-        mDatabaseReference = FirebaseDatabase.getInstance().getReference("Users");
+        mDatabaseReference = Utils.getDatabase().getReference("Users");
         if (mAuth.getCurrentUser() != null) {
             startActivity(new Intent(this, MapActivity.class));
             finish();
