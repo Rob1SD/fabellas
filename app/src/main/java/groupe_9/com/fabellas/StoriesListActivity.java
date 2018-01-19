@@ -80,73 +80,8 @@ public class StoriesListActivity
 
         setupRecyclerView(recyclerView);
 
-        mDatabaseReference = FirebaseDatabase.getInstance().getReference("Places").child(this.id).child("stories");
+        lookingForStories();
 
-        isEmptyListHandling(true);
-
-        mDatabaseReference.addChildEventListener(new ChildEventListener()
-        {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s)
-            {
-                DatabaseReference mChildDatabaseReference = FirebaseDatabase.getInstance().getReference("Stories").child(dataSnapshot.getValue().toString());
-                mChildDatabaseReference.addValueEventListener(new ValueEventListener()
-                {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot)
-                    {
-                        Story story = dataSnapshot.getValue(Story.class);
-                        stories.add(story);
-                        adapter.notifyDataSetChanged();
-                        isEmptyListHandling(false);
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError)
-                    {
-                        Log.i("thomas", "onCancelled");
-                    }
-                });
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s)
-            {
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot)
-            {
-                DatabaseReference mChildDatabaseReference =
-                        FirebaseDatabase.getInstance().getReference("Stories").child(dataSnapshot.getValue().toString());
-                mChildDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener()
-                {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot)
-                    {
-                        Story story = dataSnapshot.getValue(Story.class);
-                        stories.remove(story);
-                        adapter.notifyDataSetChanged();
-                        isEmptyListHandling(false);
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError)
-                    {
-                    }
-                });
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s)
-            {
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError)
-            {
-            }
-        });
 
     }
 
@@ -295,5 +230,98 @@ public class StoriesListActivity
     public void onPointerCaptureChanged(boolean hasCapture)
     {
 
+    }
+
+    private void lookingForStories()
+    {
+        isEmptyListHandling(true);
+
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference("Places").child(this.id);
+
+        mDatabaseReference.addValueEventListener(new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                if (!dataSnapshot.exists())
+                {
+                    isEmptyListHandling(false);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError)
+            {
+
+            }
+        });
+
+
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference("Places").child(this.id).child("stories");
+
+
+        mDatabaseReference.addChildEventListener(new ChildEventListener()
+        {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s)
+            {
+                DatabaseReference mChildDatabaseReference = FirebaseDatabase.getInstance().getReference("Stories").child(dataSnapshot.getValue().toString());
+                mChildDatabaseReference.addValueEventListener(new ValueEventListener()
+                {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot)
+                    {
+                        Story story = dataSnapshot.getValue(Story.class);
+                        stories.add(story);
+                        adapter.notifyDataSetChanged();
+                        isEmptyListHandling(false);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError)
+                    {
+                        Log.i("thomas", "onCancelled");
+                    }
+                });
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s)
+            {
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot)
+            {
+                DatabaseReference mChildDatabaseReference =
+                        FirebaseDatabase.getInstance().getReference("Stories").child(dataSnapshot.getValue().toString());
+                mChildDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener()
+                {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot)
+                    {
+                        Story story = dataSnapshot.getValue(Story.class);
+                        stories.remove(story);
+                        adapter.notifyDataSetChanged();
+                        isEmptyListHandling(false);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError)
+                    {
+                    }
+                });
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s)
+            {
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError)
+            {
+            }
+        });
     }
 }
