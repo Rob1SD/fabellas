@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -14,17 +13,15 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
 import groupe_9.com.fabellas.adapters.StoriesRecyclerViewAdapter;
 import groupe_9.com.fabellas.bo.PlaceTag;
 import groupe_9.com.fabellas.bo.Story;
+import groupe_9.com.fabellas.firebase.StoriesFinder;
+import groupe_9.com.fabellas.firebase.StoriesFinderCallbacks;
 import groupe_9.com.fabellas.firebase.Utils;
 import groupe_9.com.fabellas.fragments.StorieDetailFragment;
 import groupe_9.com.fabellas.utils.OnStoryClickable;
@@ -33,7 +30,7 @@ import groupe_9.com.fabellas.widget.FabellasAppWidgetProvider;
 
 public class StoriesListActivity
         extends AppCompatActivity
-        implements OnStoryClickable, View.OnClickListener
+        implements OnStoryClickable, View.OnClickListener, StoriesFinderCallbacks
 {
     private boolean isIntwoPanes;
     private String title;
@@ -234,93 +231,42 @@ public class StoriesListActivity
 
     private void lookingForStories()
     {
+        final StoriesFinder storiesFinder = new StoriesFinder(this);
+
+        storiesFinder.start(this.id);
+    }
+
+    @Override
+    public void onStoryFound(Story storie)
+    {
+        stories.add(storie);
+        adapter.notifyDataSetChanged();
+        isEmptyListHandling(false);
+    }
+
+    @Override
+    public void onStoryRemoved(Story storie)
+    {
+        stories.remove(storie);
+        adapter.notifyDataSetChanged();
+        isEmptyListHandling(false);
+    }
+
+    @Override
+    public void onNoPlaceFound()
+    {
+        isEmptyListHandling(false);
+    }
+
+    @Override
+    public void onNoStorieFound()
+    {
+        isEmptyListHandling(false);
+    }
+
+    @Override
+    public void onStartSearching()
+    {
         isEmptyListHandling(true);
-
-        mDatabaseReference = Utils.getDatabase().getReference("Places").child(this.id);
-
-        mDatabaseReference.addValueEventListener(new ValueEventListener()
-        {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
-            {
-                if (!dataSnapshot.exists())
-                {
-                    isEmptyListHandling(false);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError)
-            {
-
-            }
-        });
-
-
-        mDatabaseReference = Utils.getDatabase().getReference("Places").child(this.id).child("stories");
-
-
-        mDatabaseReference.addChildEventListener(new ChildEventListener()
-        {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s)
-            {
-                DatabaseReference mChildDatabaseReference = Utils.getDatabase().getReference("Stories").child(dataSnapshot.getValue().toString());
-                mChildDatabaseReference.addValueEventListener(new ValueEventListener()
-                {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot)
-                    {
-                        Story story = dataSnapshot.getValue(Story.class);
-                        stories.add(story);
-                        adapter.notifyDataSetChanged();
-                        isEmptyListHandling(false);
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError)
-                    {
-                        Log.i("thomas", "onCancelled");
-                    }
-                });
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s)
-            {
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot)
-            {
-                DatabaseReference mChildDatabaseReference = Utils.getDatabase().getReference("Stories").child(dataSnapshot.getValue().toString());
-                mChildDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener()
-                {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot)
-                    {
-                        Story story = dataSnapshot.getValue(Story.class);
-                        stories.remove(story);
-                        adapter.notifyDataSetChanged();
-                        isEmptyListHandling(false);
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError)
-                    {
-                    }
-                });
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s)
-            {
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError)
-            {
-            }
-        });
     }
 }

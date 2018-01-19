@@ -2,107 +2,30 @@ package groupe_9.com.fabellas.widget;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.AdapterView;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
 
-import groupe_9.com.fabellas.MapActivity;
 import groupe_9.com.fabellas.R;
 import groupe_9.com.fabellas.bo.Story;
-import groupe_9.com.fabellas.firebase.Utils;
+import groupe_9.com.fabellas.firebase.StoriesFinder;
+import groupe_9.com.fabellas.firebase.StoriesFinderCallbacks;
 
 /**
  * Created by thoma on 15/01/2018.
  */
 
 public class AppWidgetAdapterFactory
-        implements RemoteViewsService.RemoteViewsFactory
+        implements RemoteViewsService.RemoteViewsFactory, StoriesFinderCallbacks
 {
     private ArrayList<Story> stories;
     private String placeID;
     private int widgetID;
     private Context context;
-    private DatabaseReference mDatabaseReference;
-    private DatabaseReference mStoriesReference;
-
-    private ValueEventListener addValueEventListener = new ValueEventListener()
-    {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot)
-        {
-            final Story story = dataSnapshot.getValue(Story.class);
-            stories.add(story);
-            Log.i("thomasecalle", "Widget, onDataChanged, get story : " + story.getTitle());
-            FabellasAppWidgetProvider.sendRefreshBroadcast(context);
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError)
-        {
-            Log.i("thomas", "onCancelled");
-        }
-    };
-
-    private ValueEventListener removeValueEventListener = new ValueEventListener()
-    {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot)
-        {
-            Story story = dataSnapshot.getValue(Story.class);
-            stories.remove(story);
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError)
-        {
-        }
-    };
-
-    private ChildEventListener childEventListener = new ChildEventListener()
-    {
-
-        @Override
-        public void onChildAdded(DataSnapshot dataSnapshot, String s)
-        {
-            mStoriesReference = Utils.getDatabase().getReference("Stories").child(dataSnapshot.getValue().toString());
-            mStoriesReference.addValueEventListener(addValueEventListener);
-        }
-
-        @Override
-        public void onChildChanged(DataSnapshot dataSnapshot, String s)
-        {
-        }
-
-        @Override
-        public void onChildRemoved(DataSnapshot dataSnapshot)
-        {
-            mStoriesReference = Utils.getDatabase().getReference("Stories").child(dataSnapshot.getValue().toString());
-            mStoriesReference.addListenerForSingleValueEvent(removeValueEventListener);
-        }
-
-        @Override
-        public void onChildMoved(DataSnapshot dataSnapshot, String s)
-        {
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError)
-        {
-        }
-
-    };
 
 
     public AppWidgetAdapterFactory(Context context, Intent intent)
@@ -110,15 +33,15 @@ public class AppWidgetAdapterFactory
         this.context = context;
         placeID = intent.getStringExtra(FabellasAppWidgetProvider.APPWIDGET_PLACE_ID_EXTRA);
         widgetID = intent.getIntExtra(FabellasAppWidgetProvider.WIDGET_ID, 0);
-
     }
 
     @Override
     public void onCreate()
     {
         stories = new ArrayList<>();
-        mDatabaseReference = Utils.getDatabase().getReference("Places").child(this.placeID).child("stories");
-        mDatabaseReference.addChildEventListener(childEventListener);
+
+        final StoriesFinder storiesFinder = new StoriesFinder(this);
+        storiesFinder.start(this.placeID);
     }
 
     @Override
@@ -134,16 +57,6 @@ public class AppWidgetAdapterFactory
         {
             stories = null;
         }
-        if (mDatabaseReference != null)
-        {
-            if (mStoriesReference != null)
-            {
-                mStoriesReference.removeEventListener(addValueEventListener);
-                mStoriesReference.removeEventListener(removeValueEventListener);
-            }
-            mDatabaseReference.removeEventListener(childEventListener);
-        }
-
     }
 
     @Override
@@ -203,5 +116,38 @@ public class AppWidgetAdapterFactory
     public boolean hasStableIds()
     {
         return true;
+    }
+
+    @Override
+    public void onStoryFound(Story storie)
+    {
+        stories.add(storie);
+        Log.i("thomasecalle", "Widget, onDataChanged, get story : " + storie.getTitle());
+        FabellasAppWidgetProvider.sendRefreshBroadcast(context);
+    }
+
+    @Override
+    public void onStoryRemoved(Story storie)
+    {
+        stories.remove(storie);
+        FabellasAppWidgetProvider.sendRefreshBroadcast(context);
+    }
+
+    @Override
+    public void onNoPlaceFound()
+    {
+
+    }
+
+    @Override
+    public void onNoStorieFound()
+    {
+
+    }
+
+    @Override
+    public void onStartSearching()
+    {
+
     }
 }
