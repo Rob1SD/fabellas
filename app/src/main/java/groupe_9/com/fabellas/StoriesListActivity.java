@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -42,6 +43,7 @@ public class StoriesListActivity
     private StoriesRecyclerViewAdapter adapter;
     private RecyclerView recyclerView;
     private TextView emptyView;
+    private ProgressBar loader;
     public static final int REQUEST_CODE_FOR_ADD_STORIE_ACTIVITY = 1;
     private boolean isFromWidget = false;
 
@@ -73,11 +75,15 @@ public class StoriesListActivity
 
         recyclerView = findViewById(R.id.item_list);
         emptyView = findViewById(R.id.empty_view);
+        loader = findViewById(R.id.loader);
 
 
         setupRecyclerView(recyclerView);
 
         mDatabaseReference = FirebaseDatabase.getInstance().getReference("Places").child(this.id).child("stories");
+
+        isEmptyListHandling(true);
+
         mDatabaseReference.addChildEventListener(new ChildEventListener()
         {
             @Override
@@ -92,7 +98,7 @@ public class StoriesListActivity
                         Story story = dataSnapshot.getValue(Story.class);
                         stories.add(story);
                         adapter.notifyDataSetChanged();
-                        isEmptyListHandling();
+                        isEmptyListHandling(false);
                     }
 
                     @Override
@@ -121,7 +127,7 @@ public class StoriesListActivity
                         Story story = dataSnapshot.getValue(Story.class);
                         stories.remove(story);
                         adapter.notifyDataSetChanged();
-                        isEmptyListHandling();
+                        isEmptyListHandling(false);
                     }
 
                     @Override
@@ -142,14 +148,13 @@ public class StoriesListActivity
             }
         });
 
-        isEmptyListHandling();
-
     }
 
-    private void isEmptyListHandling()
+    private void isEmptyListHandling(boolean isLoading)
     {
-        emptyView.setVisibility(stories.isEmpty() ? ImageView.VISIBLE : View.GONE);
-        recyclerView.setVisibility(stories.isEmpty() ? ImageView.GONE : View.VISIBLE);
+        loader.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+        emptyView.setVisibility(stories.isEmpty() && !isLoading ? View.VISIBLE : View.GONE);
+        recyclerView.setVisibility(stories.isEmpty() && !isLoading ? View.GONE : View.VISIBLE);
     }
 
     private void setupRecyclerView(RecyclerView recyclerView)
