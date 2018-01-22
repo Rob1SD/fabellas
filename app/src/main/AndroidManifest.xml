@@ -56,7 +56,8 @@
             android:name=".widget.WidgetRemoteViewsService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
-        <activity android:name=".AddStorieActivity"></activity>
+        <activity android:name=".AddStorieActivity" />
+        <activity android:name=".UserStorieListActivity"></activity>
     </application>
 
 </manifest>

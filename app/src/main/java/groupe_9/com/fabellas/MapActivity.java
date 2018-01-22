@@ -97,7 +97,8 @@ public class MapActivity
 
         final MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
+        final ImageView btProfil = findViewById(R.id.floating_button_profil);
+        btProfil.setOnClickListener(this);
         googleApiClient = new GoogleApiClient
                 .Builder(this)
                 .addApi(Places.PLACE_DETECTION_API)
@@ -316,6 +317,14 @@ public class MapActivity
                 startActivity(new Intent(this, ConnectionActivity.class));
                 finish();
                 break;
+            case R.id.floating_button_profil:
+                Log.i(MapActivity.TAG, String.format("BOUTTON PROFIL" ));
+                Intent intent = new Intent(this, StoriesListActivity.class);
+                intent.putExtra("UserStories", true);
+                startActivity(intent);
+                finish();
+                break;
+
 
         }
     }

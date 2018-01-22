@@ -26,6 +26,7 @@ public class StoriesFinder
 
     public void start(String id)
     {
+        //Log.i("ROBIN", "ID = " + id);
         mDatabaseReference = Utils.getDatabase().getReference("Places").child(id);
 
         callbacks.onStartSearching();
@@ -49,6 +50,113 @@ public class StoriesFinder
         });
 
 
+        mDatabaseReference = Utils.getDatabase().getReference("Places").child(id).child("stories");
+
+        mDatabaseReference.addValueEventListener(new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                if (!dataSnapshot.exists())
+                {
+                    callbacks.onNoStorieFound();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError)
+            {
+
+            }
+        });
+
+        mDatabaseReference.addChildEventListener(new ChildEventListener()
+        {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s)
+            {
+                DatabaseReference mChildDatabaseReference = Utils.getDatabase().getReference("Stories").child(dataSnapshot.getValue().toString());
+                mChildDatabaseReference.addValueEventListener(new ValueEventListener()
+                {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot)
+                    {
+                        final Story story = dataSnapshot.getValue(Story.class);
+                        callbacks.onStoryFound(story);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError)
+                    {
+                        Log.i("thomas", "onCancelled");
+                    }
+                });
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s)
+            {
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot)
+            {
+                DatabaseReference mChildDatabaseReference = Utils.getDatabase().getReference("Stories").child(dataSnapshot.getValue().toString());
+                mChildDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener()
+                {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot)
+                    {
+                        final Story story = dataSnapshot.getValue(Story.class);
+                        callbacks.onStoryRemoved(story);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError)
+                    {
+                    }
+                });
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s)
+            {
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError)
+            {
+            }
+        });
+    }
+    public void startUserStories(String id)
+    {
+        String tmpId = "ChIJ9aHjtVHW50cRFd_KpMb9_d4"; //Pour test en attendant que j'ai la table user_stories, voir avec Jean
+        id = tmpId;
+//        mDatabaseReference = Utils.getDatabase().getReference("Users").child(id);
+        mDatabaseReference = Utils.getDatabase().getReference("Places").child(id);
+        callbacks.onStartSearching();
+
+        mDatabaseReference.addValueEventListener(new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                if (!dataSnapshot.exists())
+                {
+                    callbacks.onNoPlaceFound();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError)
+            {
+
+            }
+        });
+
+
+//        mDatabaseReference = Utils.getDatabase().getReference("Users").child(id).child("stories");
         mDatabaseReference = Utils.getDatabase().getReference("Places").child(id).child("stories");
 
         mDatabaseReference.addValueEventListener(new ValueEventListener()

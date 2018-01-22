@@ -28,4 +28,17 @@
         map:uiZoomControls="true"
         />
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/floating_button_profil"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/ic_account_circle_black"
+        android:tint="@color/white"
+        map:layout_constraintBottom_toBottomOf="parent"
+        map:layout_constraintStart_toStartOf="parent"
+        android:layout_marginLeft="8dp" />
+
 </android.support.constraint.ConstraintLayout>

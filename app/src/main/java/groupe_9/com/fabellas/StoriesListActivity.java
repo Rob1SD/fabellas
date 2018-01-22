@@ -3,11 +3,14 @@ package groupe_9.com.fabellas;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -42,13 +45,23 @@ public class StoriesListActivity
     private ProgressBar loader;
     public static final int REQUEST_CODE_FOR_ADD_STORIE_ACTIVITY = 1;
     private boolean isFromWidget = false;
+    private boolean isUserStoriesList = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_place_stories);
-
+        Bundle extras = getIntent().getExtras();
+        if (extras != null && extras.getBoolean("UserStories")) {
+            isUserStoriesList = true;
+            Log.i("ROBIN", "ON EST DANS LES STORIES DU USER");
+        }
+        else
+        {
+            isUserStoriesList = false;
+            Log.i("ROBIN", "ON EST DANS LES STORIES DU LIEU");
+        }
         stories = new ArrayList<>();
 
         if ((getIntent() != null))
@@ -57,6 +70,11 @@ public class StoriesListActivity
         }
 
         final ImageView iconImageView = findViewById(R.id.floating_button);
+//        if (isUserStoriesList)
+//        {
+//            FloatingActionButton but = (FloatingActionButton)  findViewById(R.id.floating_button);
+//            but.setVisibility(View.INVISIBLE);
+//        }
         iconImageView.setOnClickListener(this);
 
         iconImageView.setVisibility(FirebaseAuth.getInstance().getCurrentUser().isAnonymous() ? View.GONE : View.VISIBLE);
@@ -231,8 +249,16 @@ public class StoriesListActivity
     private void lookingForStories()
     {
         final StoriesFinder storiesFinder = new StoriesFinder(this);
+        if (!isUserStoriesList)
+        {
 
-        storiesFinder.start(this.id);
+            storiesFinder.start(this.id);
+        }
+        else
+        {
+            Log.i("ROBIN", "userid = " + FirebaseAuth.getInstance().getCurrentUser().getUid());
+            storiesFinder.startUserStories(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        }
     }
 
     @Override
