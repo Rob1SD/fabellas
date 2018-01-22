@@ -215,11 +215,10 @@ public class StoriesListActivity
 
     private void addNewStory(String title, String details)
     {
-        DatabaseReference PlaceDatabaseReference = Utils.getDatabase().getReference("Places").child(this.id);
         String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference StoryDatabaseReference = Utils.getDatabase().getReference("Stories").push();
         StoryDatabaseReference.setValue(new Story(StoryDatabaseReference.getKey(), details, id, title, userUid));
-        PlaceDatabaseReference.push().setValue(StoryDatabaseReference.getKey());
+        Utils.getDatabase().getReference("Places").child(this.id).child("stories").push().setValue(StoryDatabaseReference.getKey());
         Utils.getDatabase().getReference("Users").child(userUid).child("stories").push().setValue(StoryDatabaseReference.getKey());
     }
 
