@@ -35,7 +35,6 @@ public class StoriesListActivity
     private boolean isIntwoPanes;
     private String title;
     private String id;
-    private DatabaseReference mDatabaseReference;
     private ArrayList<Story> stories;
     private StoriesRecyclerViewAdapter adapter;
     private RecyclerView recyclerView;
@@ -216,10 +215,11 @@ public class StoriesListActivity
 
     private void addNewStory(String title, String details)
     {
+        DatabaseReference PlaceDatabaseReference = Utils.getDatabase().getReference("Places").child(this.id);
         String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference StoryDatabaseReference = Utils.getDatabase().getReference("Stories").push();
         StoryDatabaseReference.setValue(new Story(StoryDatabaseReference.getKey(), details, id, title, userUid));
-        mDatabaseReference.push().setValue(StoryDatabaseReference.getKey());
+        PlaceDatabaseReference.push().setValue(StoryDatabaseReference.getKey());
         Utils.getDatabase().getReference("Users").child(userUid).child("stories").push().setValue(StoryDatabaseReference.getKey());
     }
 
