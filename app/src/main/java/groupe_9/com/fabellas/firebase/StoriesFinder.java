@@ -131,10 +131,7 @@ public class StoriesFinder
     }
     public void startUserStories(String id)
     {
-        String tmpId = "ChIJ9aHjtVHW50cRFd_KpMb9_d4"; //Pour test en attendant que j'ai la table user_stories, voir avec Jean
-        id = tmpId;
-//        mDatabaseReference = Utils.getDatabase().getReference("Users").child(id);
-        mDatabaseReference = Utils.getDatabase().getReference("Places").child(id);
+        mDatabaseReference = Utils.getDatabase().getReference("Users").child(id);
         callbacks.onStartSearching();
 
         mDatabaseReference.addValueEventListener(new ValueEventListener()
@@ -156,8 +153,7 @@ public class StoriesFinder
         });
 
 
-//        mDatabaseReference = Utils.getDatabase().getReference("Users").child(id).child("stories");
-        mDatabaseReference = Utils.getDatabase().getReference("Places").child(id).child("stories");
+        mDatabaseReference = Utils.getDatabase().getReference("Users").child(id).child("stories");
 
         mDatabaseReference.addValueEventListener(new ValueEventListener()
         {
