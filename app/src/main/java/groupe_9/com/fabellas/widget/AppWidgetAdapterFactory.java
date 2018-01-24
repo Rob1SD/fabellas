@@ -76,6 +76,7 @@ public class AppWidgetAdapterFactory
         final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_list_item);
         remoteViews.setTextViewText(R.id.title, stories.get(position).getTitle());
         remoteViews.setTextViewText(R.id.details, stories.get(position).getDetail());
+        remoteViews.setTextViewText(R.id.rate, String.valueOf(stories.get(position).getRate()));
 
         // Next, set a fill-intent, which will be used to fill in the pending intent template
         // that is set on the collection view in StackWidgetProvider.

@@ -24,4 +24,6 @@
     <string name="error_empty_story_title_or_details">Veuillez saisir un titre et une description</string>
     <string name="add_storie_title">Ajout d\'une anecdote</string>
     <string name="user_stories_title">Mes Anecdotes</string>
+    <string name="validate">Valider</string>
+    <string name="adding_rate_message">Ajout de votre note : %.1f/5</string>
 </resources>

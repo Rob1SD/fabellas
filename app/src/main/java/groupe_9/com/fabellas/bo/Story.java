@@ -4,8 +4,6 @@ import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.io.Serializable;
 
-import groupe_9.com.fabellas.adapters.StoriesRecyclerViewAdapter;
-
 /**
  * Created by spyro on 17/01/2018.
  */
@@ -19,6 +17,7 @@ public class Story implements Serializable
     private String placeId;
     private String title;
     private String userId;
+    private float rate;
 
     public Story()
     {
@@ -92,5 +91,15 @@ public class Story implements Serializable
     public void setDetail(String detail)
     {
         this.detail = detail;
+    }
+
+    public float getRate()
+    {
+        return rate;
+    }
+
+    public void setRate(float rate)
+    {
+        this.rate = rate;
     }
 }

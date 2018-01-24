@@ -82,6 +82,8 @@ public class StoriesFinder
                     public void onDataChange(DataSnapshot dataSnapshot)
                     {
                         final Story story = dataSnapshot.getValue(Story.class);
+                        //TODO enlever cette fake note, c'est juste pour tester le graphisme
+                        story.setRate(3.5f);
                         callbacks.onStoryFound(story);
                     }
 
@@ -129,6 +131,7 @@ public class StoriesFinder
             }
         });
     }
+
     public void startUserStories(String id)
     {
         mDatabaseReference = Utils.getDatabase().getReference("Users").child(id);

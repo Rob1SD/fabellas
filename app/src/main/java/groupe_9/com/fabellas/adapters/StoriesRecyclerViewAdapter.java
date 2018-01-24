@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -48,11 +49,15 @@ public class StoriesRecyclerViewAdapter
     @Override
     public void onBindViewHolder(final StorieViewHolder holder, int position)
     {
-        holder.title.setText(stories.get(position).getTitle());
-        holder.content.setText(stories.get(position).getDetail());
+        final Story story = stories.get(position);
+        holder.title.setText(story.getTitle());
+        holder.content.setText(story.getDetail());
+        holder.ratingBar.setRating(story.getRate());
 
-        holder.itemView.setTag(stories.get(position));
+
+        holder.itemView.setTag(story);
         holder.itemView.setOnClickListener(mOnClickListener);
+
     }
 
     @Override
@@ -65,12 +70,14 @@ public class StoriesRecyclerViewAdapter
     {
         final TextView title;
         final TextView content;
+        final RatingBar ratingBar;
 
         StorieViewHolder(View view)
         {
             super(view);
             title = view.findViewById(R.id.title);
             content = view.findViewById(R.id.details);
+            ratingBar = view.findViewById(R.id.ratingBar);
         }
     }
 }

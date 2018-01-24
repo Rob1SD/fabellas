@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+
     android:padding="@dimen/list_item_padding"
     >
 
@@ -14,8 +15,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ellipsize="end"
-        android:maxLines="1"
         android:lines="1"
+        android:maxLines="1"
         android:textAppearance="?attr/textAppearanceListItem"
         android:textColor="@color/black"
         android:textSize="@dimen/list_item_title"
@@ -28,12 +29,39 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ellipsize="end"
-        android:maxLines="3"
         android:lines="3"
+        android:maxLines="3"
         android:textAppearance="?attr/textAppearanceListItem"
         android:textColor="@color/grey"
         android:textSize="@dimen/list_item_details"
         tools:text="details details details details details details details details
         details details details details details details details details details "
         />
+
+    <LinearLayout
+        android:id="@+id/rating"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="@dimen/list_item_padding"
+        >
+
+        <TextView
+            android:id="@+id/rate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textColor="@color/colorAccent"
+            android:textSize="@dimen/list_item_details"
+            tools:text="3"
+            />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_star"
+            android:tint="@color/colorAccent"
+            />
+
+    </LinearLayout>
 </LinearLayout>
