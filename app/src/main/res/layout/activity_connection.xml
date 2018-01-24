@@ -5,28 +5,54 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="groupe_9.com.fabellas.ConnectionActivity">
+    <!--android:background="@drawable/gradient"-->
 
     <Button
         android:id="@+id/connectPhoneBtn"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginBottom="60dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginStart="40dp"
         android:text="@string/connect_phone"
+        android:drawableLeft="@drawable/ic_action_phone"
+        android:gravity="left|center_vertical"
+        android:drawablePadding="40dp"
+        android:paddingLeft="15dp"
+        android:background="#224274"
+        android:textColor="@color/white"
+        android:shadowColor="#005900"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/connectGuestBtn" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/connectGuestBtn"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginStart="40dp"
+        android:drawableLeft="@drawable/ic_action_anon"
+        android:text="@string/connect_guest"
+        android:gravity="left|center_vertical"
+        android:drawablePadding="40dp"
+        android:paddingLeft="15dp"
+        android:background="#224274"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toTopOf="@+id/connectPhoneBtn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="344dp"
+        android:layout_height="150dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/connect_guest"
+        android:layout_marginTop="30dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/logo" />
 </android.support.constraint.ConstraintLayout>
