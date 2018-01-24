@@ -98,8 +98,12 @@ public class MapActivity
 
         final MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
         final ImageView btProfil = findViewById(R.id.floating_button_profil);
+        btProfil.setVisibility(FirebaseAuth.getInstance().getCurrentUser().isAnonymous() ? View.GONE : View.VISIBLE);
         btProfil.setOnClickListener(this);
+
+
         googleApiClient = new GoogleApiClient
                 .Builder(this)
                 .addApi(Places.PLACE_DETECTION_API)
@@ -180,7 +184,7 @@ public class MapActivity
     public void onInfoWindowClick(Marker marker)
     {
         //Toast.makeText(this, "Marker id : " + marker.getTag(), Toast.LENGTH_LONG).show();
-        final Intent intent = new Intent(this, StoriesListActivity.class);
+        final Intent intent = new Intent(this, PlaceStoriesActivity.class);
         intent.setAction(INTENT_FROM_MAP_ACTIVITY);
         final Bundle bundle = new Bundle();
         bundle.putSerializable(MapActivity.PLACE, (PlaceTag) marker.getTag());

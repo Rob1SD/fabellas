@@ -33,7 +33,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".StorieDetailActivity"/>
-        <activity android:name=".StoriesListActivity"/>
+        <activity android:name=".PlaceStoriesActivity"/>
         <activity android:name=".MapActivity"/>
 
         <receiver android:name=".widget.FabellasAppWidgetProvider">

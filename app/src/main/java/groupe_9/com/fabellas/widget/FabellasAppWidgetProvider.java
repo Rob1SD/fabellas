@@ -9,12 +9,11 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.TaskStackBuilder;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 import groupe_9.com.fabellas.MapActivity;
 import groupe_9.com.fabellas.R;
-import groupe_9.com.fabellas.StoriesListActivity;
+import groupe_9.com.fabellas.PlaceStoriesActivity;
 import groupe_9.com.fabellas.bo.PlaceTag;
 
 /**
@@ -50,7 +49,7 @@ public class FabellasAppWidgetProvider extends AppWidgetProvider
         // template to handle the click listener for each item
         //clickIntent.putExtra(APPWIDGET_PLACE_NAME, placeName);
         //clickIntent.setData(Uri.parse("myapp://widget/id/#togetituniqie" + appWidgetId));
-        Intent clickIntentTemplate = new Intent(context, StoriesListActivity.class);
+        Intent clickIntentTemplate = new Intent(context, PlaceStoriesActivity.class);
         //clickIntentTemplate.putExtra(APPWIDGET_PLACE_NAME, placeName);
         PendingIntent clickPendingIntentTemplate = TaskStackBuilder.create(context)
                 .addNextIntentWithParentStack(clickIntentTemplate)
@@ -119,7 +118,7 @@ public class FabellasAppWidgetProvider extends AppWidgetProvider
 
     private static PendingIntent clickOnTitleIntent(Context context, String placeName, String placeID, int appWidgetId)
     {
-        final Intent titleIntent = new Intent(context, StoriesListActivity.class);
+        final Intent titleIntent = new Intent(context, PlaceStoriesActivity.class);
         titleIntent.setAction(INTENT_FROM_APPWIDGET_TITLE);
         final Bundle bundle = new Bundle();
         bundle.putSerializable(MapActivity.PLACE, new PlaceTag(placeName, placeID));
