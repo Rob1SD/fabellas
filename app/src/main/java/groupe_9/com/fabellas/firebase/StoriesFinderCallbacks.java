@@ -12,8 +12,6 @@ public interface StoriesFinderCallbacks
 
     void onStoryRemoved(Story storie);
 
-    void onNoPlaceFound();
-
     void onNoStorieFound();
 
     void onStartSearching();

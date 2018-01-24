@@ -134,12 +134,6 @@ public class AppWidgetAdapterFactory
     }
 
     @Override
-    public void onNoPlaceFound()
-    {
-
-    }
-
-    @Override
     public void onNoStorieFound()
     {
 

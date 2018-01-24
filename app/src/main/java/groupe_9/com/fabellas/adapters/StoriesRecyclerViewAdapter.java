@@ -20,26 +20,22 @@ public class StoriesRecyclerViewAdapter
         extends RecyclerView.Adapter<StoriesRecyclerViewAdapter.StorieViewHolder>
 {
 
-    private final OnStoryClickable mParentActivity;
+    private final OnStoryClickable listener;
     private final ArrayList<Story> stories;
-    private final boolean isInTwoPane;
     private final View.OnClickListener mOnClickListener = new View.OnClickListener()
     {
         @Override
         public void onClick(View view)
         {
             final Story storie = (Story) view.getTag();
-            mParentActivity.clickedOnStory(storie);
+            listener.clickedOnStory(storie);
         }
     };
 
-    public StoriesRecyclerViewAdapter(OnStoryClickable parent,
-                                      ArrayList<Story> stories,
-                                      boolean isInTwoPane)
+    public StoriesRecyclerViewAdapter(OnStoryClickable listener, ArrayList<Story> stories)
     {
         this.stories = stories;
-        mParentActivity = parent;
-        this.isInTwoPane = isInTwoPane;
+        this.listener = listener;
     }
 
     @Override

@@ -23,4 +23,5 @@
     <string name="storie_details">Description de  l\'anecdote</string>
     <string name="error_empty_story_title_or_details">Veuillez saisir un titre et une description</string>
     <string name="add_storie_title">Ajout d\'une anecdote</string>
+    <string name="user_stories_title">Mes Anecdotes</string>
 </resources>

@@ -38,7 +38,7 @@ public class StoriesFinder
             {
                 if (!dataSnapshot.exists())
                 {
-                    callbacks.onNoPlaceFound();
+                    callbacks.onNoStorieFound();
                 }
             }
 
@@ -141,7 +141,7 @@ public class StoriesFinder
             {
                 if (!dataSnapshot.exists())
                 {
-                    callbacks.onNoPlaceFound();
+                    callbacks.onNoStorieFound();
                 }
             }
 

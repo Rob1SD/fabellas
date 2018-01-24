@@ -73,6 +73,7 @@ public class MapActivity
     public static final String PLACE = "placeID";
     public static final String TAG = "thomasecalle";
     public static final String INTENT_FROM_MAP_ACTIVITY = "intentFromMapActivity";
+    public static final String USER_PROFIL_ACTION = "userProfilAction";
 
     private GoogleMap googleMap;
     private String currentPlaceID;
@@ -318,11 +319,10 @@ public class MapActivity
                 finish();
                 break;
             case R.id.floating_button_profil:
-                Log.i(MapActivity.TAG, String.format("BOUTTON PROFIL" ));
-                Intent intent = new Intent(this, StoriesListActivity.class);
-                intent.putExtra("UserStories", true);
+                Log.i(MapActivity.TAG, String.format("BOUTTON PROFIL"));
+                Intent intent = new Intent(this, UserStoriesActivity.class);
+                intent.setAction(USER_PROFIL_ACTION);
                 startActivity(intent);
-                finish();
                 break;
 
 
