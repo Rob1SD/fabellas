@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 import groupe_9.com.fabellas.R;
 import groupe_9.com.fabellas.bo.Story;
 
@@ -58,7 +60,11 @@ public class StorieDetailFragment extends Fragment implements View.OnClickListen
 
 
             validate.setOnClickListener(this);
+
+
+            validate.setVisibility(FirebaseAuth.getInstance().getCurrentUser().isAnonymous() ? View.GONE : View.VISIBLE);
             detail.setText(storie.getDetail());
+            ratingBar.setIsIndicator(FirebaseAuth.getInstance().getCurrentUser().isAnonymous());
             ratingBar.setRating(storie.getRate());
 
         }
