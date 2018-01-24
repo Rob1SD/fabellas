@@ -26,6 +26,7 @@ public class AppWidgetAdapterFactory
     private String placeID;
     private int widgetID;
     private Context context;
+    private StoriesFinder storiesFinder;
 
 
     public AppWidgetAdapterFactory(Context context, Intent intent)
@@ -40,7 +41,7 @@ public class AppWidgetAdapterFactory
     {
         stories = new ArrayList<>();
 
-        final StoriesFinder storiesFinder = new StoriesFinder(this);
+        storiesFinder = new StoriesFinder(this);
         storiesFinder.start(this.placeID);
     }
 
@@ -53,6 +54,7 @@ public class AppWidgetAdapterFactory
     @Override
     public void onDestroy()
     {
+        storiesFinder = null;
         if (stories != null)
         {
             stories = null;
