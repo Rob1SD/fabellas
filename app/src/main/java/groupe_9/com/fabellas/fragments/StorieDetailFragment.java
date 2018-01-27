@@ -11,9 +11,17 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.Map;
 
 import groupe_9.com.fabellas.R;
 import groupe_9.com.fabellas.bo.Story;
+import groupe_9.com.fabellas.firebase.Utils;
 
 public class StorieDetailFragment extends Fragment implements View.OnClickListener
 {
@@ -25,6 +33,8 @@ public class StorieDetailFragment extends Fragment implements View.OnClickListen
     private ProgressDialog progressDialog;
 
     private Story storie;
+
+    private DatabaseReference mStoriesMyNotationDatabaseReference;
 
     public StorieDetailFragment()
     {
@@ -44,6 +54,24 @@ public class StorieDetailFragment extends Fragment implements View.OnClickListen
         progressDialog = new ProgressDialog(getContext());
         progressDialog.setCancelable(false);
 
+        mStoriesMyNotationDatabaseReference = Utils.getDatabase().getReference("Stories").child(storie.getUID()).child("notations").
+                child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        mStoriesMyNotationDatabaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.getValue() == null) {
+                    validate.setVisibility(View.VISIBLE);
+                    ratingBar.setIsIndicator(false);
+                }
+                else{
+                    validate.setVisibility(View.GONE);
+                    ratingBar.setIsIndicator(true);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
+        });
     }
 
     @Override
@@ -61,10 +89,13 @@ public class StorieDetailFragment extends Fragment implements View.OnClickListen
 
             validate.setOnClickListener(this);
 
+            final boolean userRatePossibility =
+                    !(FirebaseAuth.getInstance().getCurrentUser().isAnonymous() ||
+                            storie.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()));
 
-            validate.setVisibility(FirebaseAuth.getInstance().getCurrentUser().isAnonymous() ? View.GONE : View.VISIBLE);
+            validate.setVisibility(userRatePossibility ? View.VISIBLE : View.GONE);
             detail.setText(storie.getDetail());
-            ratingBar.setIsIndicator(FirebaseAuth.getInstance().getCurrentUser().isAnonymous());
+            ratingBar.setIsIndicator(!userRatePossibility);
             ratingBar.setRating(storie.getRate());
 
         }
@@ -83,6 +114,29 @@ public class StorieDetailFragment extends Fragment implements View.OnClickListen
         progressDialog.setMessage(getString(R.string.adding_rate_message, ratingBar.getRating()));
 
         progressDialog.show();
+
+        mStoriesMyNotationDatabaseReference.setValue(ratingBar.getRating());
+
+        final DatabaseReference mStoriesNotationDatabaseReference =
+                Utils.getDatabase().getReference("Stories").child(storie.getUID()).child("notations");
+        mStoriesNotationDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                float totalNotation = 0;
+                Map<String, Float> notationMap = dataSnapshot.getValue(new GenericTypeIndicator<Map<String, Float>>(){});
+                for (Float f: notationMap.values()) {
+                    totalNotation += f;
+                }
+                totalNotation /= notationMap.size();
+                Utils.getDatabase().getReference("Stories").child(storie.getUID()).child("rate").setValue(totalNotation);
+                progressDialog.dismiss();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
+        });
+
+        //mDatabaseReference.child(user.getUid()).setValue(new User(user.getUid(), user.getPhoneNumber(), null));
 
         /*
             Ici, JEAN, tu peux faire tes appels pour
@@ -103,15 +157,5 @@ public class StorieDetailFragment extends Fragment implements View.OnClickListen
                 Une fois que tu auras fais le "dismiss" la ou il faut, tu pourra senlever les lignes après ce commentaire :)
 
          */
-
-        new android.os.Handler().postDelayed(
-                new Runnable()
-                {
-                    public void run()
-                    {
-                        progressDialog.dismiss();
-                    }
-                },
-                3000);
     }
 }
