@@ -102,4 +102,13 @@ public class Story implements Serializable
     {
         this.rate = rate;
     }
+
+    public void cloneRate(Story other)
+    {
+        if (other == null) return;
+        if (this.getRate() != other.getRate())
+        {
+            this.setRate(other.getRate());
+        }
+    }
 }

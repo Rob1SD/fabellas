@@ -33,6 +33,7 @@ public abstract class StoriesListActivity
         USER_STORIES,
         PLACE_STORIES
     }
+
     protected ArrayList<Story> stories;
     protected StoriesRecyclerViewAdapter adapter;
     protected RecyclerView recyclerView;
@@ -90,7 +91,16 @@ public abstract class StoriesListActivity
     @Override
     public void onStoryFound(Story storie)
     {
-        stories.add(storie);
+        if (stories.contains(storie))
+        {
+            final int index = stories.indexOf(storie);
+            final Story initialStory = stories.get(index);
+            initialStory.cloneRate(storie);
+        }
+        else
+        {
+            stories.add(storie);
+        }
         adapter.notifyDataSetChanged();
         isEmptyListHandling(false);
     }

@@ -54,10 +54,6 @@ public class StorieDetailFragment extends Fragment implements View.OnClickListen
         progressDialog = new ProgressDialog(getContext());
         progressDialog.setCancelable(false);
 
-        mStoriesMyNotationDatabaseReference = Utils.getDatabase().getReference("Stories")
-                .child(storie.getUID()).child("notations")
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
-
     }
 
     @Override
@@ -75,25 +71,35 @@ public class StorieDetailFragment extends Fragment implements View.OnClickListen
 
             validate.setOnClickListener(this);
 
-            final boolean userRatePossibility =
-                    !(FirebaseAuth.getInstance().getCurrentUser().isAnonymous() ||
+            final boolean userRatePossibility =!(FirebaseAuth.getInstance().getCurrentUser().isAnonymous() ||
                             storie.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()));
 
-            mStoriesMyNotationDatabaseReference.addValueEventListener(new ValueEventListener() {
+            mStoriesMyNotationDatabaseReference = Utils.getDatabase().getReference("Stories")
+                    .child(storie.getUID()).child("notations")
+                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+            mStoriesMyNotationDatabaseReference.addValueEventListener(new ValueEventListener()
+            {
                 @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    if(dataSnapshot.getValue() == null && userRatePossibility) {
+                public void onDataChange(DataSnapshot dataSnapshot)
+                {
+                    if (dataSnapshot.getValue() == null && userRatePossibility)
+                    {
                         validate.setVisibility(View.VISIBLE);
                         ratingBar.setIsIndicator(false);
                     }
-                    else{
+                    else
+                    {
                         validate.setVisibility(View.GONE);
                         ratingBar.setIsIndicator(true);
                     }
+
                 }
 
                 @Override
-                public void onCancelled(DatabaseError databaseError) { }
+                public void onCancelled(DatabaseError databaseError)
+                {
+                }
             });
 
             validate.setVisibility(userRatePossibility ? View.VISIBLE : View.GONE);
@@ -122,12 +128,15 @@ public class StorieDetailFragment extends Fragment implements View.OnClickListen
 
         final DatabaseReference mStoriesNotationDatabaseReference =
                 Utils.getDatabase().getReference("Stories").child(storie.getUID()).child("notations");
-        mStoriesNotationDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        mStoriesNotationDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener()
+        {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
                 float totalNotation = 0;
-                Map<String, Float> notationMap = dataSnapshot.getValue(new GenericTypeIndicator<Map<String, Float>>(){});
-                for (Float f: notationMap.values()) {
+                Map<String, Float> notationMap = dataSnapshot.getValue(new GenericTypeIndicator<Map<String, Float>>() {});
+                for (Float f : notationMap.values())
+                {
                     totalNotation += f;
                 }
                 totalNotation /= notationMap.size();
@@ -136,7 +145,9 @@ public class StorieDetailFragment extends Fragment implements View.OnClickListen
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) { }
+            public void onCancelled(DatabaseError databaseError)
+            {
+            }
         });
 
         //mDatabaseReference.child(user.getUid()).setValue(new User(user.getUid(), user.getPhoneNumber(), null));

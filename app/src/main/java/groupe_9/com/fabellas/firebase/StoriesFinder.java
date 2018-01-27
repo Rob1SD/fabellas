@@ -75,6 +75,7 @@ public class StoriesFinder
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s)
             {
+
                 DatabaseReference mChildDatabaseReference = Utils.getDatabase().getReference("Stories").child(dataSnapshot.getValue().toString());
                 mChildDatabaseReference.addValueEventListener(new ValueEventListener()
                 {
@@ -82,8 +83,6 @@ public class StoriesFinder
                     public void onDataChange(DataSnapshot dataSnapshot)
                     {
                         final Story story = dataSnapshot.getValue(Story.class);
-                        //TODO enlever cette fake note, c'est juste pour tester le graphisme
-                        story.setRate(3.5f);
                         callbacks.onStoryFound(story);
                     }
 
