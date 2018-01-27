@@ -28,6 +28,8 @@ public class PlaceStoriesActivity
     private String id;
     public static final int REQUEST_CODE_FOR_ADD_STORIE_ACTIVITY = 1;
     private boolean isFromWidget = false;
+    private float DEFAULT_RATE = 2.5f;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -173,7 +175,7 @@ public class PlaceStoriesActivity
     {
         String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference StoryDatabaseReference = Utils.getDatabase().getReference("Stories").push();
-        StoryDatabaseReference.setValue(new Story(StoryDatabaseReference.getKey(), details, id, title, userUid));
+        StoryDatabaseReference.setValue(new Story(StoryDatabaseReference.getKey(), details, id, title, userUid, DEFAULT_RATE));
         Utils.getDatabase().getReference("Places").child(this.id).child("stories").push().setValue(StoryDatabaseReference.getKey());
         Utils.getDatabase().getReference("Users").child(userUid).child("stories").push().setValue(StoryDatabaseReference.getKey());
     }

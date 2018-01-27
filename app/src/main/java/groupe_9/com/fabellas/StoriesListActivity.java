@@ -95,7 +95,7 @@ public abstract class StoriesListActivity
         {
             final int index = stories.indexOf(storie);
             final Story initialStory = stories.get(index);
-            initialStory.cloneRate(storie);
+            initialStory.clone(storie);
         }
         else
         {

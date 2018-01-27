@@ -24,13 +24,14 @@ public class Story implements Serializable
 
     }
 
-    public Story(String UID, String detail, String placeId, String title, String userId)
+    public Story(String UID, String detail, String placeId, String title, String userId, float rate)
     {
         this.UID = UID;
         this.detail = detail;
         this.placeId = placeId;
         this.title = title;
         this.userId = userId;
+        this.rate = rate;
     }
 
     @Override
@@ -103,12 +104,11 @@ public class Story implements Serializable
         this.rate = rate;
     }
 
-    public void cloneRate(Story other)
+    public void clone(Story other)
     {
         if (other == null) return;
-        if (this.getRate() != other.getRate())
-        {
-            this.setRate(other.getRate());
-        }
+        this.setRate(other.getRate());
+        this.setTitle(other.getTitle());
+        this.setDetail(other.getDetail());
     }
 }
