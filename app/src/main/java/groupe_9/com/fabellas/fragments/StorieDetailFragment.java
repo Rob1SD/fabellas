@@ -54,24 +54,10 @@ public class StorieDetailFragment extends Fragment implements View.OnClickListen
         progressDialog = new ProgressDialog(getContext());
         progressDialog.setCancelable(false);
 
-        mStoriesMyNotationDatabaseReference = Utils.getDatabase().getReference("Stories").child(storie.getUID()).child("notations").
-                child(FirebaseAuth.getInstance().getCurrentUser().getUid());
-        mStoriesMyNotationDatabaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.getValue() == null) {
-                    validate.setVisibility(View.VISIBLE);
-                    ratingBar.setIsIndicator(false);
-                }
-                else{
-                    validate.setVisibility(View.GONE);
-                    ratingBar.setIsIndicator(true);
-                }
-            }
+        mStoriesMyNotationDatabaseReference = Utils.getDatabase().getReference("Stories")
+                .child(storie.getUID()).child("notations")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) { }
-        });
     }
 
     @Override
@@ -92,6 +78,23 @@ public class StorieDetailFragment extends Fragment implements View.OnClickListen
             final boolean userRatePossibility =
                     !(FirebaseAuth.getInstance().getCurrentUser().isAnonymous() ||
                             storie.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()));
+
+            mStoriesMyNotationDatabaseReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.getValue() == null && userRatePossibility) {
+                        validate.setVisibility(View.VISIBLE);
+                        ratingBar.setIsIndicator(false);
+                    }
+                    else{
+                        validate.setVisibility(View.GONE);
+                        ratingBar.setIsIndicator(true);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) { }
+            });
 
             validate.setVisibility(userRatePossibility ? View.VISIBLE : View.GONE);
             detail.setText(storie.getDetail());
