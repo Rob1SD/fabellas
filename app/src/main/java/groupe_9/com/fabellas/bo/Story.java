@@ -17,14 +17,14 @@ public class Story implements Serializable
     private String placeId;
     private String title;
     private String userId;
-    private float rate;
+    private Float rate;
 
     public Story()
     {
 
     }
 
-    public Story(String UID, String detail, String placeId, String title, String userId, float rate)
+    public Story(String UID, String detail, String placeId, String title, String userId, Float rate)
     {
         this.UID = UID;
         this.detail = detail;
@@ -94,12 +94,12 @@ public class Story implements Serializable
         this.detail = detail;
     }
 
-    public float getRate()
+    public Float getRate()
     {
         return rate;
     }
 
-    public void setRate(float rate)
+    public void setRate(Float rate)
     {
         this.rate = rate;
     }

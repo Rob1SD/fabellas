@@ -175,7 +175,7 @@ public class PlaceStoriesActivity
     {
         String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference StoryDatabaseReference = Utils.getDatabase().getReference("Stories").push();
-        StoryDatabaseReference.setValue(new Story(StoryDatabaseReference.getKey(), details, id, title, userUid, DEFAULT_RATE));
+        StoryDatabaseReference.setValue(new Story(StoryDatabaseReference.getKey(), details, id, title, userUid, null));
         Utils.getDatabase().getReference("Places").child(this.id).child("stories").push().setValue(StoryDatabaseReference.getKey());
         Utils.getDatabase().getReference("Users").child(userUid).child("stories").push().setValue(StoryDatabaseReference.getKey());
     }

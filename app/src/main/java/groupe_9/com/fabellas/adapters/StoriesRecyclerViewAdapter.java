@@ -52,7 +52,7 @@ public class StoriesRecyclerViewAdapter
         final Story story = stories.get(position);
         holder.title.setText(story.getTitle());
         holder.content.setText(story.getDetail());
-        holder.ratingBar.setRating(story.getRate());
+        holder.ratingBar.setRating(story.getRate() == null ? 0f : story.getRate());
 
 
         holder.itemView.setTag(story);
