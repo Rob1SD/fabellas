@@ -35,6 +35,7 @@ public class StorieDetailFragment extends Fragment implements View.OnClickListen
     private Story storie;
 
     private DatabaseReference mStoriesMyNotationDatabaseReference;
+    private DatabaseReference mStoriesRateDatabaseReference;
 
     public StorieDetailFragment()
     {
@@ -68,48 +69,77 @@ public class StorieDetailFragment extends Fragment implements View.OnClickListen
             ratingBar = rootView.findViewById(R.id.ratingBar);
             validate = rootView.findViewById(R.id.validate);
 
+            detail.setText(storie.getDetail());
 
             validate.setOnClickListener(this);
 
-            final boolean userRatePossibility =!(FirebaseAuth.getInstance().getCurrentUser().isAnonymous() ||
-                            storie.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()));
+            mStoriesRateDatabaseReference = Utils.getDatabase().getReference("Stories")
+                    .child(storie.getUID()).child("rate");
+            mStoriesRateDatabaseReference.addValueEventListener(getStoryNotationListener());
 
-            mStoriesMyNotationDatabaseReference = Utils.getDatabase().getReference("Stories")
-                    .child(storie.getUID()).child("notations")
-                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+            if(getUserPossibilityToRate()) {
+                mStoriesMyNotationDatabaseReference = Utils.getDatabase().getReference("Stories")
+                        .child(storie.getUID()).child("notations")
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                mStoriesMyNotationDatabaseReference.addValueEventListener(getMyNotationListener());
+                changeNotationBarStatus(true);
+            }
+            else{
+                changeNotationBarStatus(false);
+            }
+        }
+        return rootView;
+    }
 
-            mStoriesMyNotationDatabaseReference.addValueEventListener(new ValueEventListener()
-            {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot)
-                {
-                    if (dataSnapshot.getValue() == null && userRatePossibility)
-                    {
-                        validate.setVisibility(View.VISIBLE);
-                        ratingBar.setIsIndicator(false);
-                    }
-                    else
-                    {
-                        validate.setVisibility(View.GONE);
-                        ratingBar.setIsIndicator(true);
-                    }
+    private void changeNotationBarStatus(boolean status){
+        validate.setVisibility(status ? View.VISIBLE : View.GONE);
+        ratingBar.setIsIndicator(!status);
+    }
 
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError)
-                {
-                }
-            });
-
-            validate.setVisibility(userRatePossibility ? View.VISIBLE : View.GONE);
-            detail.setText(storie.getDetail());
-            ratingBar.setIsIndicator(!userRatePossibility);
-            ratingBar.setRating(storie.getRate());
-
+    private boolean getUserPossibilityToRate(){
+        if(FirebaseAuth.getInstance().getCurrentUser().isAnonymous()){
+            return false;
         }
 
-        return rootView;
+        if(storie.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
+            return false;
+        }
+        return true;
+    }
+
+    private ValueEventListener getMyNotationListener(){
+        return new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                changeNotationBarStatus(null == dataSnapshot.getValue());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError)
+            {
+            }
+        };
+    }
+
+    private ValueEventListener getStoryNotationListener(){
+        return new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(null != dataSnapshot.getValue()){
+                    ratingBar.setRating(dataSnapshot.getValue(float.class));
+                }
+                else{
+                    ratingBar.setRating(0);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
     }
 
     @Override
@@ -149,27 +179,5 @@ public class StorieDetailFragment extends Fragment implements View.OnClickListen
             {
             }
         });
-
-        //mDatabaseReference.child(user.getUid()).setValue(new User(user.getUid(), user.getPhoneNumber(), null));
-
-        /*
-            Ici, JEAN, tu peux faire tes appels pour
-                calculer la nouvelle moyenne
-                mettre à jour la note de la story
-                ajouter cette nouvelle note dans la liste des notes de la story
-
-                Lorsque tu sera sûr, dans tes listeners, que la note a bien été prise en compte
-                tu pourra appeler "progressDialog.dismiss();" à l'endroit !
-                ça enlevera le loader
-
-                puisque tu auras alors calculer la nouvelle moyenne, tu peux d'ailleurs la mettre à jour dans la vue
-                en faisant
-                - ratingBar.setRating(laNouvelleNote);
-
-                Attention : Après ce commentaire, j'ai fais un Fake Timer pour dismiss le loader après 3 secondes
-                ça ne sert qu'à ne pas bloquer la page le temps que tu mettes les listener
-                Une fois que tu auras fais le "dismiss" la ou il faut, tu pourra senlever les lignes après ce commentaire :)
-
-         */
     }
 }

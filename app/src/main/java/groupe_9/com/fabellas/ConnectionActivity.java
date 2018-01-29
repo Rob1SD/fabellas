@@ -107,8 +107,6 @@ public class ConnectionActivity extends AppCompatActivity {
                 });
                 startActivity(new Intent(ConnectionActivity.this, MapActivity.class));
                 finish();
-            } else {
-                Toast.makeText(this, "failed authentification", Toast.LENGTH_LONG).show();
             }
         }
     }
