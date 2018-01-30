@@ -65,7 +65,7 @@ public class MapActivity
         GoogleApiClient.OnConnectionFailedListener,
         GoogleApiClient.ConnectionCallbacks, View.OnClickListener, ClusterManager.OnClusterItemInfoWindowClickListener<PlaceItem>, ClusterManager.OnClusterClickListener<PlaceItem>
 {
-    public static final int ZOOM = 18;
+    public static final int ZOOM = 19;
     private static final int REQUEST_APPLICATION_SETTINGS_CODE = 1000;
     private static final int REQUEST_LOCATION_ON_SETTINGS_CODE = 2000;
     public static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 3000;
@@ -77,6 +77,7 @@ public class MapActivity
     public static final String USER_PROFIL_ACTION = "userProfilAction";
 
     private GoogleMap googleMap;
+    private MapFragment mapFragment;
     private FusedLocationProviderClient locationProviderClient;
     private Location lastLocation;
     private View mapContainer;
@@ -97,7 +98,7 @@ public class MapActivity
 
         locationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
-        final MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+        mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
         final ImageView btProfil = findViewById(R.id.floating_button_profil);
@@ -128,6 +129,7 @@ public class MapActivity
         {
             googleApiClient.connect();
         }
+        //mapFragment.getMapAsync(this);
     }
 
     @Override
@@ -145,6 +147,8 @@ public class MapActivity
     public void onMapReady(GoogleMap googleMap)
     {
         this.googleMap = googleMap;
+        clusterManager = new ClusterManager<PlaceItem>(MapActivity.this, googleMap);
+
         //this.googleMap.setOnInfoWindowClickListener(this);
         MapActivityPermissionsDispatcher.goToMyLocationWithPermissionCheck(this, googleMap);
     }
@@ -169,7 +173,6 @@ public class MapActivity
                                 googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lastLocation.getLatitude(),
                                         lastLocation.getLongitude()), MapActivity.ZOOM));
 
-                                clusterManager = new ClusterManager<PlaceItem>(MapActivity.this, googleMap);
                                 googleMap.setOnCameraIdleListener(clusterManager);
                                 googleMap.setOnInfoWindowClickListener(clusterManager);
                                 googleMap.setOnMarkerClickListener(clusterManager);
