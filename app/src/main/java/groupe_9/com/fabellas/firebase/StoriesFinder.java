@@ -26,7 +26,6 @@ public class StoriesFinder
 
     public void start(String id)
     {
-        //Log.i("ROBIN", "ID = " + id);
         mDatabaseReference = Utils.getDatabase().getReference("Places").child(id);
 
         callbacks.onStartSearching();
@@ -82,6 +81,10 @@ public class StoriesFinder
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot)
                     {
+                        if(null == dataSnapshot.getValue()) {
+                            mChildDatabaseReference.removeEventListener(this);
+                            return;
+                        }
                         final Story story = dataSnapshot.getValue(Story.class);
                         callbacks.onStoryFound(story);
                     }
@@ -102,21 +105,8 @@ public class StoriesFinder
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot)
             {
-                DatabaseReference mChildDatabaseReference = Utils.getDatabase().getReference("Stories").child(dataSnapshot.getValue().toString());
-                mChildDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener()
-                {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot)
-                    {
-                        final Story story = dataSnapshot.getValue(Story.class);
-                        callbacks.onStoryRemoved(story);
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError)
-                    {
-                    }
-                });
+                callbacks.onStoryRemoved(
+                        new Story(dataSnapshot.getValue().toString(), null, null, null, null, null));
             }
 
             @Override
@@ -186,6 +176,10 @@ public class StoriesFinder
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot)
                     {
+                        if(null == dataSnapshot.getValue()) {
+                            mChildDatabaseReference.removeEventListener(this);
+                            return;
+                        }
                         final Story story = dataSnapshot.getValue(Story.class);
                         callbacks.onStoryFound(story);
                     }
@@ -206,21 +200,8 @@ public class StoriesFinder
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot)
             {
-                DatabaseReference mChildDatabaseReference = Utils.getDatabase().getReference("Stories").child(dataSnapshot.getValue().toString());
-                mChildDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener()
-                {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot)
-                    {
-                        final Story story = dataSnapshot.getValue(Story.class);
-                        callbacks.onStoryRemoved(story);
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError)
-                    {
-                    }
-                });
+                callbacks.onStoryRemoved(
+                        new Story(dataSnapshot.getValue().toString(), null, null, null, null, null));
             }
 
             @Override
