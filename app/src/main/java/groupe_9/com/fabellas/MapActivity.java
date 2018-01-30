@@ -37,15 +37,17 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.maps.android.clustering.Cluster;
+import com.google.maps.android.clustering.ClusterManager;
 
+import java.util.Iterator;
+
+import groupe_9.com.fabellas.bo.PlaceItem;
 import groupe_9.com.fabellas.bo.PlaceTag;
 import groupe_9.com.fabellas.utils.FabellasSettingsRequest;
 import permissions.dispatcher.NeedsPermission;
@@ -61,8 +63,7 @@ public class MapActivity
         implements
         OnMapReadyCallback,
         GoogleApiClient.OnConnectionFailedListener,
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleMap.OnInfoWindowClickListener, View.OnClickListener
+        GoogleApiClient.ConnectionCallbacks, View.OnClickListener, ClusterManager.OnClusterItemInfoWindowClickListener<PlaceItem>, ClusterManager.OnClusterClickListener<PlaceItem>
 {
     public static final int ZOOM = 18;
     private static final int REQUEST_APPLICATION_SETTINGS_CODE = 1000;
@@ -76,10 +77,10 @@ public class MapActivity
     public static final String USER_PROFIL_ACTION = "userProfilAction";
 
     private GoogleMap googleMap;
-    private String currentPlaceID;
     private FusedLocationProviderClient locationProviderClient;
     private Location lastLocation;
     private View mapContainer;
+    private ClusterManager<PlaceItem> clusterManager;
 
     private GoogleApiClient googleApiClient;
     private boolean isUserBackFromSearch = false;
@@ -144,7 +145,7 @@ public class MapActivity
     public void onMapReady(GoogleMap googleMap)
     {
         this.googleMap = googleMap;
-        this.googleMap.setOnInfoWindowClickListener(this);
+        //this.googleMap.setOnInfoWindowClickListener(this);
         MapActivityPermissionsDispatcher.goToMyLocationWithPermissionCheck(this, googleMap);
     }
 
@@ -167,6 +168,15 @@ public class MapActivity
                                 lastLocation = task.getResult();
                                 googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lastLocation.getLatitude(),
                                         lastLocation.getLongitude()), MapActivity.ZOOM));
+
+                                clusterManager = new ClusterManager<PlaceItem>(MapActivity.this, googleMap);
+                                googleMap.setOnCameraIdleListener(clusterManager);
+                                googleMap.setOnInfoWindowClickListener(clusterManager);
+                                googleMap.setOnMarkerClickListener(clusterManager);
+
+
+                                clusterManager.setOnClusterItemInfoWindowClickListener(MapActivity.this);
+                                clusterManager.setOnClusterClickListener(MapActivity.this);
                             }
 
                         }
@@ -181,13 +191,12 @@ public class MapActivity
     }
 
     @Override
-    public void onInfoWindowClick(Marker marker)
+    public void onClusterItemInfoWindowClick(PlaceItem item)
     {
-        //Toast.makeText(this, "Marker id : " + marker.getTag(), Toast.LENGTH_LONG).show();
         final Intent intent = new Intent(this, PlaceStoriesActivity.class);
         intent.setAction(INTENT_FROM_MAP_ACTIVITY);
         final Bundle bundle = new Bundle();
-        bundle.putSerializable(MapActivity.PLACE, (PlaceTag) marker.getTag());
+        bundle.putSerializable(MapActivity.PLACE, (PlaceTag) item.getPlaceTag());
         intent.putExtras(bundle);
 
         startActivity(intent);
@@ -282,7 +291,6 @@ public class MapActivity
     {
         final PendingResult<PlaceLikelihoodBuffer> currentPlaces = Places.PlaceDetectionApi.getCurrentPlace(googleApiClient, null);
 
-
         currentPlaces.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>()
         {
             @Override
@@ -335,13 +343,12 @@ public class MapActivity
 
     private void putMarkerOnPlace(Place place)
     {
-        final Marker marker = googleMap.addMarker(new MarkerOptions()
-                .position(place.getLatLng())
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-                .title(place.getName().toString()));
 
         final PlaceTag placeTag = new PlaceTag(place.getName().toString(), place.getId());
-        marker.setTag(placeTag);
+        final PlaceItem placeItem = new PlaceItem(placeTag, place.getLatLng().latitude, place.getLatLng().longitude);
+
+        clusterManager.addItem(placeItem);
+
     }
 
     private void lookForUniquePlace()
@@ -415,4 +422,19 @@ public class MapActivity
     }
 
 
+    @Override
+    public boolean onClusterClick(Cluster<PlaceItem> cluster)
+    {
+        final Iterator<PlaceItem> iterator = cluster.getItems().iterator();
+        if (!iterator.hasNext())
+        {
+            return false;
+        }
+
+        final PlaceItem item = iterator.next();
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom
+                (new LatLng(item.getPosition().latitude,
+                        item.getPosition().longitude), MapActivity.ZOOM));
+        return true;
+    }
 }

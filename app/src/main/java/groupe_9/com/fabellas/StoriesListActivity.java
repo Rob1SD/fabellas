@@ -91,18 +91,23 @@ public abstract class StoriesListActivity
     @Override
     public void onStoryFound(Story storie)
     {
-        if (stories.contains(storie))
+        if (storie != null)
         {
-            final int index = stories.indexOf(storie);
-            final Story initialStory = stories.get(index);
-            initialStory.clone(storie);
+            if (stories.contains(storie))
+            {
+                final int index = stories.indexOf(storie);
+                final Story initialStory = stories.get(index);
+                initialStory.clone(storie);
+
+            }
+            else
+            {
+                stories.add(storie);
+            }
+            adapter.notifyDataSetChanged();
+            isEmptyListHandling(false);
         }
-        else
-        {
-            stories.add(storie);
-        }
-        adapter.notifyDataSetChanged();
-        isEmptyListHandling(false);
+
     }
 
     @Override
