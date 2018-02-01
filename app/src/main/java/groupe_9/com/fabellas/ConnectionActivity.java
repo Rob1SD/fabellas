@@ -98,15 +98,15 @@ public class ConnectionActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if(dataSnapshot.getValue() == null){
-                            mDatabaseReference.child(user.getUid()).setValue(new User(user.getUid(), user.getPhoneNumber(), null));
+                            dataSnapshot.getRef().setValue(new User(user.getUid(), user.getPhoneNumber(), null));
+                            startActivity(new Intent(ConnectionActivity.this, MapActivity.class));
+                            finish();
                         }
                     }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) { }
                 });
-                startActivity(new Intent(ConnectionActivity.this, MapActivity.class));
-                finish();
             }
         }
     }
