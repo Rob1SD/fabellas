@@ -46,6 +46,15 @@ public class PlaceStoriesActivity
 
         iconImageView.setOnClickListener(this);
 
+        if (FirebaseAuth.getInstance().getCurrentUser() == null)
+        {
+            final Intent intent = new Intent(this, ConnectionActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
         iconImageView.setVisibility(FirebaseAuth.getInstance().getCurrentUser().isAnonymous() ? View.GONE : View.VISIBLE);
 
         setUpToolbar(title);
@@ -58,6 +67,7 @@ public class PlaceStoriesActivity
         recyclerView = findViewById(R.id.item_list);
         emptyView = findViewById(R.id.empty_view);
         loader = findViewById(R.id.loader);
+        network_error_view = findViewById(R.id.network_error_view);
 
 
         setupRecyclerView(this);
@@ -179,4 +189,6 @@ public class PlaceStoriesActivity
         Utils.getDatabase().getReference("Places").child(this.id).child("stories").push().setValue(StoryDatabaseReference.getKey());
         Utils.getDatabase().getReference("Users").child(userUid).child("stories").push().setValue(StoryDatabaseReference.getKey());
     }
+
+
 }

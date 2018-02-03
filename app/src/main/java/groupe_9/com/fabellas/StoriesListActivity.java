@@ -37,6 +37,7 @@ public abstract class StoriesListActivity
     protected ArrayList<Story> stories;
     protected StoriesRecyclerViewAdapter adapter;
     protected RecyclerView recyclerView;
+    protected TextView network_error_view;
     protected TextView emptyView;
     protected ProgressBar loader;
 
@@ -68,14 +69,25 @@ public abstract class StoriesListActivity
 
     private void isEmptyListHandling(boolean isLoading)
     {
+
         loader.setVisibility(isLoading ? View.VISIBLE : View.GONE);
         emptyView.setVisibility(stories.isEmpty() && !isLoading ? View.VISIBLE : View.GONE);
+        network_error_view.setVisibility(View.GONE);
         recyclerView.setVisibility(stories.isEmpty() && !isLoading ? View.GONE : View.VISIBLE);
     }
 
+    private void noNetworkCOnnection()
+    {
+        network_error_view.setVisibility(View.VISIBLE);
+        loader.setVisibility(View.GONE);
+        emptyView.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.GONE);
+    }
+
+
     protected void lookingForStories(StoriesListActivity.STORIES_TYPE type, String id)
     {
-        final StoriesFinder storiesFinder = new StoriesFinder(this);
+        final StoriesFinder storiesFinder = new StoriesFinder(this, this);
         if (type == STORIES_TYPE.PLACE_STORIES)
         {
             storiesFinder.start(id);
@@ -128,5 +140,11 @@ public abstract class StoriesListActivity
     public void onStartSearching()
     {
         isEmptyListHandling(true);
+    }
+
+    @Override
+    public void onNetworkError()
+    {
+        noNetworkCOnnection();
     }
 }

@@ -26,4 +26,5 @@
     <string name="user_stories_title">Mes Anecdotes</string>
     <string name="validate">Valider</string>
     <string name="adding_rate_message">Ajout de votre note : %.1f/5</string>
+    <string name="no_network">Aucun réseau détecté, veuillez vérifier votre connexion.</string>
 </resources>

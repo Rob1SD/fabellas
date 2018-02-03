@@ -46,6 +46,7 @@ public class UserStoriesActivity
         recyclerView = findViewById(R.id.item_list);
         emptyView = findViewById(R.id.empty_view);
         loader = findViewById(R.id.loader);
+        network_error_view = findViewById(R.id.network_error_view);
 
         setupRecyclerView(this);
 

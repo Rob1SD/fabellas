@@ -1,5 +1,8 @@
 package groupe_9.com.fabellas.firebase;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 
 import com.google.firebase.database.ChildEventListener;
@@ -8,6 +11,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
+import groupe_9.com.fabellas.MapActivity;
 import groupe_9.com.fabellas.bo.Story;
 
 /**
@@ -18,10 +22,12 @@ public class StoriesFinder
 {
     private StoriesFinderCallbacks callbacks;
     private DatabaseReference mDatabaseReference;
+    private Context context;
 
-    public StoriesFinder(StoriesFinderCallbacks callbacks)
+    public StoriesFinder(Context context, StoriesFinderCallbacks callbacks)
     {
         this.callbacks = callbacks;
+        this.context = context;
     }
 
     public void start(String id)
@@ -44,7 +50,7 @@ public class StoriesFinder
             @Override
             public void onCancelled(DatabaseError databaseError)
             {
-
+                Log.i(MapActivity.TAG, "onResearch cancelled");
             }
         });
 
@@ -81,7 +87,8 @@ public class StoriesFinder
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot)
                     {
-                        if(null == dataSnapshot.getValue()) {
+                        if (null == dataSnapshot.getValue())
+                        {
                             mChildDatabaseReference.removeEventListener(this);
                             return;
                         }
@@ -176,7 +183,8 @@ public class StoriesFinder
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot)
                     {
-                        if(null == dataSnapshot.getValue()) {
+                        if (null == dataSnapshot.getValue())
+                        {
                             mChildDatabaseReference.removeEventListener(this);
                             return;
                         }
@@ -214,5 +222,12 @@ public class StoriesFinder
             {
             }
         });
+    }
+
+    private boolean isNetworkAvailable()
+    {
+        final ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        final NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }

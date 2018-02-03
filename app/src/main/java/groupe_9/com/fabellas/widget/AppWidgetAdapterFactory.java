@@ -41,7 +41,7 @@ public class AppWidgetAdapterFactory
     {
         stories = new ArrayList<>();
 
-        storiesFinder = new StoriesFinder(this);
+        storiesFinder = new StoriesFinder(context, this);
         storiesFinder.start(this.placeID);
     }
 
@@ -145,6 +145,12 @@ public class AppWidgetAdapterFactory
 
     @Override
     public void onStartSearching()
+    {
+
+    }
+
+    @Override
+    public void onNetworkError()
     {
 
     }

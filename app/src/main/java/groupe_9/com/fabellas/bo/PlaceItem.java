@@ -9,19 +9,29 @@ import com.google.maps.android.clustering.ClusterItem;
 
 public class PlaceItem implements ClusterItem
 {
-    private final LatLng mPosition;
+    private final double latitude;
+    private final double longitude;
     private PlaceTag placeTag;
 
-    public PlaceItem(PlaceTag placeTag, double lat, double lng)
+
+    public static final String TABLE_NAME = "Place";
+    public static final String COL_ID = "ID";
+    public static final String COL_LATITUDE = "LATITUDE";
+    public static final String COL_LONGITUDE = "LONGITUDE";
+    public static final String COL_TITLE = "TITLE";
+
+
+    public PlaceItem(PlaceTag placeTag, double latitude, double longitude)
     {
         this.placeTag = placeTag;
-        mPosition = new LatLng(lat, lng);
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     @Override
     public LatLng getPosition()
     {
-        return mPosition;
+        return new LatLng(latitude, longitude);
     }
 
     @Override
@@ -36,8 +46,29 @@ public class PlaceItem implements ClusterItem
         return null;
     }
 
+    @Override
+    public String toString()
+    {
+        return getTitle() + " (latitude : " + getLatitude() + ", longitude : " + getLongitude() + ")";
+    }
+
     public PlaceTag getPlaceTag()
     {
         return placeTag;
+    }
+
+    public double getLatitude()
+    {
+        return latitude;
+    }
+
+    public double getLongitude()
+    {
+        return longitude;
+    }
+
+    public String getID()
+    {
+        return placeTag.getId();
     }
 }

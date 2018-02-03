@@ -8,12 +8,14 @@ import groupe_9.com.fabellas.bo.Story;
 
 public interface StoriesFinderCallbacks
 {
-    void onStoryFound(Story storie);
+    void onStoryFound(Story story);
 
-    void onStoryRemoved(Story storie);
+    void onStoryRemoved(Story story);
 
     void onNoStorieFound();
 
     void onStartSearching();
+
+    void onNetworkError();
 
 }

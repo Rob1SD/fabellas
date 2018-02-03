@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -45,10 +46,12 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import groupe_9.com.fabellas.bo.PlaceItem;
 import groupe_9.com.fabellas.bo.PlaceTag;
+import groupe_9.com.fabellas.cache.DatabaseHelper;
 import groupe_9.com.fabellas.utils.FabellasSettingsRequest;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnNeverAskAgain;
@@ -65,7 +68,7 @@ public class MapActivity
         GoogleApiClient.OnConnectionFailedListener,
         GoogleApiClient.ConnectionCallbacks, View.OnClickListener, ClusterManager.OnClusterItemInfoWindowClickListener<PlaceItem>, ClusterManager.OnClusterClickListener<PlaceItem>
 {
-    public static final int ZOOM = 19;
+    public static final int ZOOM = 18;
     private static final int REQUEST_APPLICATION_SETTINGS_CODE = 1000;
     private static final int REQUEST_LOCATION_ON_SETTINGS_CODE = 2000;
     public static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 3000;
@@ -129,6 +132,9 @@ public class MapActivity
         {
             googleApiClient.connect();
         }
+
+        lookForPlaces();
+        //goToMyLocation(googleMap);
         //mapFragment.getMapAsync(this);
     }
 
@@ -196,6 +202,7 @@ public class MapActivity
     @Override
     public void onClusterItemInfoWindowClick(PlaceItem item)
     {
+
         final Intent intent = new Intent(this, PlaceStoriesActivity.class);
         intent.setAction(INTENT_FROM_MAP_ACTIVITY);
         final Bundle bundle = new Bundle();
@@ -281,12 +288,13 @@ public class MapActivity
     @Override
     public void onConnected(@Nullable Bundle bundle)
     {
+        //Toast.makeText(this, "on connected", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onConnectionSuspended(int i)
     {
-
+        //Toast.makeText(this, "on connection suspended", Toast.LENGTH_SHORT).show();
     }
 
     @SuppressLint("MissingPermission")
@@ -299,16 +307,28 @@ public class MapActivity
             @Override
             public void onResult(PlaceLikelihoodBuffer likelyPlaces)
             {
-                for (PlaceLikelihood placeLikelihood : likelyPlaces)
+                final int statusCodes = likelyPlaces.getStatus().getStatusCode();
+
+                if (statusCodes == CommonStatusCodes.NETWORK_ERROR)
                 {
-                    final Place place = placeLikelihood.getPlace();
+                    Log.i(TAG, "Search for places cancelled for network error");
+                    retrievingPlacesFromDatabase();
+                }
+                else
+                {
+                    for (PlaceLikelihood placeLikelihood : likelyPlaces)
+                    {
+                        final Place place = placeLikelihood.getPlace();
 
-                    Log.i(MapActivity.TAG, String.format("Place '%s' found with id: '%s'", place.getName(), place.getId()));
+                        Log.i(MapActivity.TAG, String.format("Place '%s' found with id: '%s'", place.getName(), place.getId()));
 
-                    putMarkerOnPlace(place);
+                        putMarkerOnPlace(place);
 
+                    }
                 }
                 likelyPlaces.release();
+
+
             }
         });
 
@@ -346,11 +366,27 @@ public class MapActivity
 
     private void putMarkerOnPlace(Place place)
     {
-
         final PlaceTag placeTag = new PlaceTag(place.getName().toString(), place.getId());
         final PlaceItem placeItem = new PlaceItem(placeTag, place.getLatLng().latitude, place.getLatLng().longitude);
 
+        final DatabaseHelper databaseHelper = new DatabaseHelper(this, DatabaseHelper.DB_NAME, DatabaseHelper.DB_VERSION);
+
+        databaseHelper.addPlace(placeItem);
+
+        clusterManager.clearItems();
         clusterManager.addItem(placeItem);
+    }
+
+    private void retrievingPlacesFromDatabase()
+    {
+        final DatabaseHelper databaseHelper = new DatabaseHelper(this, DatabaseHelper.DB_NAME, DatabaseHelper.DB_VERSION);
+        final ArrayList<PlaceItem> allPlaces = databaseHelper.getAllPlaces();
+
+        clusterManager.clearItems();
+        for (PlaceItem placeItem : allPlaces)
+        {
+            clusterManager.addItem(placeItem);
+        }
 
     }
 

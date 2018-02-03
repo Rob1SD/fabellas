@@ -1,6 +1,7 @@
 package groupe_9.com.fabellas.fragments;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -19,6 +20,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.Map;
 
+import groupe_9.com.fabellas.ConnectionActivity;
 import groupe_9.com.fabellas.R;
 import groupe_9.com.fabellas.bo.Story;
 import groupe_9.com.fabellas.firebase.Utils;
@@ -77,37 +79,56 @@ public class StorieDetailFragment extends Fragment implements View.OnClickListen
                     .child(storie.getUID()).child("rate");
             mStoriesRateDatabaseReference.addValueEventListener(getStoryNotationListener());
 
-            if(getUserPossibilityToRate()) {
-                mStoriesMyNotationDatabaseReference = Utils.getDatabase().getReference("Stories")
-                        .child(storie.getUID()).child("notations")
-                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
-                mStoriesMyNotationDatabaseReference.addValueEventListener(getMyNotationListener());
-                changeNotationBarStatus(true);
+            if (FirebaseAuth.getInstance().getCurrentUser() == null)
+            {
+                final Intent intent = new Intent(getContext(), ConnectionActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                getActivity().finish();
             }
-            else{
-                changeNotationBarStatus(false);
+            else
+            {
+                if (getUserPossibilityToRate())
+                {
+                    mStoriesMyNotationDatabaseReference = Utils.getDatabase().getReference("Stories")
+                            .child(storie.getUID()).child("notations")
+                            .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                    mStoriesMyNotationDatabaseReference.addValueEventListener(getMyNotationListener());
+                    changeNotationBarStatus(true);
+                }
+                else
+                {
+                    changeNotationBarStatus(false);
+                }
             }
+
+
         }
         return rootView;
     }
 
-    private void changeNotationBarStatus(boolean status){
+    private void changeNotationBarStatus(boolean status)
+    {
         validate.setVisibility(status ? View.VISIBLE : View.GONE);
         ratingBar.setIsIndicator(!status);
     }
 
-    private boolean getUserPossibilityToRate(){
-        if(FirebaseAuth.getInstance().getCurrentUser().isAnonymous()){
+    private boolean getUserPossibilityToRate()
+    {
+        if (FirebaseAuth.getInstance().getCurrentUser().isAnonymous())
+        {
             return false;
         }
 
-        if(storie.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
+        if (storie.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()))
+        {
             return false;
         }
         return true;
     }
 
-    private ValueEventListener getMyNotationListener(){
+    private ValueEventListener getMyNotationListener()
+    {
         return new ValueEventListener()
         {
             @Override
@@ -123,20 +144,26 @@ public class StorieDetailFragment extends Fragment implements View.OnClickListen
         };
     }
 
-    private ValueEventListener getStoryNotationListener(){
-        return new ValueEventListener() {
+    private ValueEventListener getStoryNotationListener()
+    {
+        return new ValueEventListener()
+        {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(null != dataSnapshot.getValue()){
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                if (null != dataSnapshot.getValue())
+                {
                     ratingBar.setRating(dataSnapshot.getValue(float.class));
                 }
-                else{
+                else
+                {
                     ratingBar.setRating(0);
                 }
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled(DatabaseError databaseError)
+            {
 
             }
         };
@@ -164,7 +191,9 @@ public class StorieDetailFragment extends Fragment implements View.OnClickListen
             public void onDataChange(DataSnapshot dataSnapshot)
             {
                 float totalNotation = 0;
-                Map<String, Float> notationMap = dataSnapshot.getValue(new GenericTypeIndicator<Map<String, Float>>() {});
+                Map<String, Float> notationMap = dataSnapshot.getValue(new GenericTypeIndicator<Map<String, Float>>()
+                {
+                });
                 for (Float f : notationMap.values())
                 {
                     totalNotation += f;
