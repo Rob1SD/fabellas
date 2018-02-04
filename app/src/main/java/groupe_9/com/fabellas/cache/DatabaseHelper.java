@@ -56,17 +56,36 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
     public void addPlace(PlaceItem item)
     {
-        final SQLiteDatabase database = this.getWritableDatabase();
+        if (!alreadyExist(item))
+        {
+            final SQLiteDatabase database = this.getWritableDatabase();
 
-        final ContentValues values = new ContentValues();
-        values.put(PlaceItem.COL_ID, item.getID());
-        values.put(PlaceItem.COL_TITLE, item.getTitle());
-        values.put(PlaceItem.COL_LATITUDE, item.getLatitude());
-        values.put(PlaceItem.COL_LONGITUDE, item.getLongitude());
+            final ContentValues values = new ContentValues();
+            values.put(PlaceItem.COL_ID, item.getID());
+            values.put(PlaceItem.COL_TITLE, item.getTitle());
+            values.put(PlaceItem.COL_LATITUDE, item.getLatitude());
+            values.put(PlaceItem.COL_LONGITUDE, item.getLongitude());
 
 
-        database.insert(PlaceItem.TABLE_NAME, null, values);
+            database.insert(PlaceItem.TABLE_NAME, null, values);
+            database.close();
+        }
+
+    }
+
+    private boolean alreadyExist(PlaceItem item)
+    {
+        final SQLiteDatabase database = this.getReadableDatabase();
+
+        final Cursor cursor = database.query(PlaceItem.TABLE_NAME, new String[]{PlaceItem.COL_ID}, PlaceItem.COL_ID + "=?",
+                new String[]{String.valueOf(item.getID())}, null, null, null, null);
+        if (cursor != null && cursor.moveToFirst())
+        {
+            return true;
+        }
+        cursor.close();
         database.close();
+        return false;
 
     }
 
@@ -99,9 +118,9 @@ public class DatabaseHelper extends SQLiteOpenHelper
             } while (cursor.moveToNext());
         }
 
+        cursor.close();
         database.close();
 
-        // return contact list
         return list;
     }
 }

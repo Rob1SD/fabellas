@@ -24,7 +24,6 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -137,9 +136,9 @@ public class MapActivity
 
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
 
-        if (permissionCheck == PackageManager.PERMISSION_GRANTED)
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED && mapFragment != null)
         {
-            lookForPlaces();
+            mapFragment.getMapAsync(this);
         }
 
         //goToMyLocation(googleMap);
@@ -270,6 +269,7 @@ public class MapActivity
                     final Place place = PlaceAutocomplete.getPlace(this, data);
                     this.googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(), MapActivity.ZOOM));
                     putMarkerOnPlace(place);
+                    retrievingPlacesFromDatabase();
 
                     Log.i(MapActivity.TAG, "Place Searched : " + place.getName());
                 }
@@ -308,6 +308,9 @@ public class MapActivity
     @SuppressLint("MissingPermission")
     public void lookForPlaces()
     {
+
+        retrievingPlacesFromDatabase();
+
         final PendingResult<PlaceLikelihoodBuffer> currentPlaces = Places.PlaceDetectionApi.getCurrentPlace(googleApiClient, null);
 
         currentPlaces.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>()
@@ -317,24 +320,16 @@ public class MapActivity
             {
                 final int statusCodes = likelyPlaces.getStatus().getStatusCode();
 
-                if (statusCodes == CommonStatusCodes.NETWORK_ERROR)
+                for (PlaceLikelihood placeLikelihood : likelyPlaces)
                 {
-                    Log.i(TAG, "Search for places cancelled for network error");
-                    retrievingPlacesFromDatabase();
+                    final Place place = placeLikelihood.getPlace();
+
+                    Log.i(MapActivity.TAG, String.format("Place '%s' found with id: '%s'", place.getName(), place.getId()));
+
+                    putMarkerOnPlace(place);
+
                 }
-                else
-                {
-                    clusterManager.clearItems();
-                    for (PlaceLikelihood placeLikelihood : likelyPlaces)
-                    {
-                        final Place place = placeLikelihood.getPlace();
 
-                        Log.i(MapActivity.TAG, String.format("Place '%s' found with id: '%s'", place.getName(), place.getId()));
-
-                        putMarkerOnPlace(place);
-
-                    }
-                }
                 likelyPlaces.release();
 
 
@@ -390,13 +385,16 @@ public class MapActivity
         final DatabaseHelper databaseHelper = new DatabaseHelper(this, DatabaseHelper.DB_NAME, DatabaseHelper.DB_VERSION);
         final ArrayList<PlaceItem> allPlaces = databaseHelper.getAllPlaces();
 
-        clusterManager.clearItems();
+        if (clusterManager != null)
+        {
+            clusterManager.clearItems();
+        }
         for (PlaceItem placeItem : allPlaces)
         {
             clusterManager.addItem(placeItem);
         }
-
     }
+
 
     private void lookForUniquePlace()
     {
