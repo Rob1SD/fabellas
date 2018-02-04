@@ -29,6 +29,13 @@ public class PlaceItem implements ClusterItem
     }
 
     @Override
+    public boolean equals(Object obj)
+    {
+        if (!(obj instanceof PlaceItem)) return false;
+        return getID().equals(((PlaceItem) obj).getID());
+    }
+
+    @Override
     public LatLng getPosition()
     {
         return new LatLng(latitude, longitude);

@@ -3,7 +3,6 @@ package groupe_9.com.fabellas;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,7 +10,6 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -24,6 +22,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -69,7 +68,7 @@ public class MapActivity
         GoogleApiClient.OnConnectionFailedListener,
         GoogleApiClient.ConnectionCallbacks, View.OnClickListener, ClusterManager.OnClusterItemInfoWindowClickListener<PlaceItem>, ClusterManager.OnClusterClickListener<PlaceItem>
 {
-    public static final int ZOOM = 18;
+    public static final int ZOOM = 17;
     private static final int REQUEST_APPLICATION_SETTINGS_CODE = 1000;
     private static final int REQUEST_LOCATION_ON_SETTINGS_CODE = 2000;
     public static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 3000;
@@ -134,13 +133,14 @@ public class MapActivity
             googleApiClient.connect();
         }
 
+        /*
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
 
-        if (permissionCheck == PackageManager.PERMISSION_GRANTED && mapFragment != null)
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED && mapFragment != null && !isUserBackFromSearch)
         {
-            mapFragment.getMapAsync(this);
+            goToMyLocation(googleMap);
         }
-
+        */
         //goToMyLocation(googleMap);
         //mapFragment.getMapAsync(this);
     }
@@ -171,6 +171,13 @@ public class MapActivity
     void goToMyLocation(GoogleMap googleMap)
     {
         googleMap.setMyLocationEnabled(true);
+        googleMap.setOnCameraIdleListener(clusterManager);
+        googleMap.setOnInfoWindowClickListener(clusterManager);
+        googleMap.setOnMarkerClickListener(clusterManager);
+
+
+        clusterManager.setOnClusterItemInfoWindowClickListener(this);
+        clusterManager.setOnClusterClickListener(this);
 
         locationProviderClient.getLastLocation()
                 .addOnCompleteListener(this, new OnCompleteListener<Location>()
@@ -185,16 +192,7 @@ public class MapActivity
                                 lastLocation = task.getResult();
                                 googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lastLocation.getLatitude(),
                                         lastLocation.getLongitude()), MapActivity.ZOOM));
-
-                                googleMap.setOnCameraIdleListener(clusterManager);
-                                googleMap.setOnInfoWindowClickListener(clusterManager);
-                                googleMap.setOnMarkerClickListener(clusterManager);
-
-
-                                clusterManager.setOnClusterItemInfoWindowClickListener(MapActivity.this);
-                                clusterManager.setOnClusterClickListener(MapActivity.this);
                             }
-
                         }
                         else
                         {
@@ -209,7 +207,6 @@ public class MapActivity
     @Override
     public void onClusterItemInfoWindowClick(PlaceItem item)
     {
-
         final Intent intent = new Intent(this, PlaceStoriesActivity.class);
         intent.setAction(INTENT_FROM_MAP_ACTIVITY);
         final Bundle bundle = new Bundle();
@@ -269,7 +266,7 @@ public class MapActivity
                     final Place place = PlaceAutocomplete.getPlace(this, data);
                     this.googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(), MapActivity.ZOOM));
                     putMarkerOnPlace(place);
-                    retrievingPlacesFromDatabase();
+                    //retrievingPlacesFromDatabase();
 
                     Log.i(MapActivity.TAG, "Place Searched : " + place.getName());
                 }
@@ -308,9 +305,6 @@ public class MapActivity
     @SuppressLint("MissingPermission")
     public void lookForPlaces()
     {
-
-        retrievingPlacesFromDatabase();
-
         final PendingResult<PlaceLikelihoodBuffer> currentPlaces = Places.PlaceDetectionApi.getCurrentPlace(googleApiClient, null);
 
         currentPlaces.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>()
@@ -320,18 +314,24 @@ public class MapActivity
             {
                 final int statusCodes = likelyPlaces.getStatus().getStatusCode();
 
-                for (PlaceLikelihood placeLikelihood : likelyPlaces)
+                if (statusCodes == CommonStatusCodes.NETWORK_ERROR)
                 {
-                    final Place place = placeLikelihood.getPlace();
+                    retrievingPlacesFromDatabase();
+                }
+                else
+                {
+                    for (PlaceLikelihood placeLikelihood : likelyPlaces)
+                    {
+                        final Place place = placeLikelihood.getPlace();
 
-                    Log.i(MapActivity.TAG, String.format("Place '%s' found with id: '%s'", place.getName(), place.getId()));
+                        Log.i(MapActivity.TAG, String.format("Place '%s' found with id: '%s'", place.getName(), place.getId()));
 
-                    putMarkerOnPlace(place);
+                        putMarkerOnPlace(place);
 
+                    }
                 }
 
                 likelyPlaces.release();
-
 
             }
         });
