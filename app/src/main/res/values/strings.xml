@@ -29,4 +29,6 @@
     <string name="no_network">Aucun réseau détecté, veuillez vérifier votre connexion.</string>
     <string name="story_removal_dialog_title">Cette anectode vient d\'être supprimée</string>
     <string name="story_removal_dialog_message">L\'auteur de cette anecdote vient de la supprimer, elle n\'est donc plus disponible.\nVous allez être dediriger vers la liste.</string>
+    <string name="deconnection_title">Déconnexion</string>
+    <string name="deconnection_message">Êtes-vous sûr de vouloir vous déconnecter ?</string>
 </resources>

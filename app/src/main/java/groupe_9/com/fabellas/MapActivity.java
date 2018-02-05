@@ -2,6 +2,7 @@ package groupe_9.com.fabellas;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
@@ -348,14 +349,8 @@ public class MapActivity
                 lookForUniquePlace();
                 break;
             case R.id.icon_logout:
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                FirebaseAuth.getInstance().signOut();
-                if (user.isAnonymous())
-                {
-                    user.delete();
-                }
-                startActivity(new Intent(this, ConnectionActivity.class));
-                finish();
+                handleLogout();
+
                 break;
             case R.id.floating_button_profil:
                 Log.i(MapActivity.TAG, String.format("BOUTTON PROFIL"));
@@ -366,6 +361,44 @@ public class MapActivity
 
 
         }
+    }
+
+    private void handleLogout()
+    {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.deconnection_title);
+        builder.setMessage(R.string.deconnection_message);
+        builder.setCancelable(false);
+
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i)
+            {
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                FirebaseAuth.getInstance().signOut();
+                if (user.isAnonymous())
+                {
+                    user.delete();
+                }
+                startActivity(new Intent(MapActivity.this, ConnectionActivity.class));
+                finish();
+            }
+        });
+
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i)
+            {
+                dialogInterface.dismiss();
+            }
+        });
+
+        builder.create().show();
+
+
+
     }
 
     private void putMarkerOnPlace(Place place)
