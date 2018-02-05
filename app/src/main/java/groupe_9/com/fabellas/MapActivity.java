@@ -397,8 +397,6 @@ public class MapActivity
 
         builder.create().show();
 
-
-
     }
 
     private void putMarkerOnPlace(Place place)
