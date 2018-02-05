@@ -17,9 +17,11 @@ public class ExampleUnitTest
         assertEquals(4, 2 + 2);
     }
 
+    /*
     @Test
     public void addition_isCorrect_fail_test() throws Exception
     {
         assertEquals(5, 2 + 2);
     }
+    */
 }
