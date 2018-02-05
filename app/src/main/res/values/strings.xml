@@ -27,4 +27,6 @@
     <string name="validate">Valider</string>
     <string name="adding_rate_message">Ajout de votre note : %.1f/5</string>
     <string name="no_network">Aucun réseau détecté, veuillez vérifier votre connexion.</string>
+    <string name="story_removal_dialog_title">Cette anectode vient d\'être supprimée</string>
+    <string name="story_removal_dialog_message">L\'auteur de cette anecdote vient de la supprimer, elle n\'est donc plus disponible.\nVous allez être dediriger vers la liste.</string>
 </resources>

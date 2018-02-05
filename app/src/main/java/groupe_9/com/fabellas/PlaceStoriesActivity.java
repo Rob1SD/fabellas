@@ -1,5 +1,7 @@
 package groupe_9.com.fabellas;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,13 +17,14 @@ import groupe_9.com.fabellas.bo.Story;
 import groupe_9.com.fabellas.firebase.StoriesFinderCallbacks;
 import groupe_9.com.fabellas.firebase.Utils;
 import groupe_9.com.fabellas.fragments.StorieDetailFragment;
+import groupe_9.com.fabellas.utils.OnDetailStoryRemoval;
 import groupe_9.com.fabellas.utils.OnStoryClickable;
 import groupe_9.com.fabellas.widget.FabellasAppWidgetConfigureActivity;
 import groupe_9.com.fabellas.widget.FabellasAppWidgetProvider;
 
 public class PlaceStoriesActivity
         extends StoriesListActivity
-        implements OnStoryClickable, View.OnClickListener, StoriesFinderCallbacks
+        implements OnStoryClickable, View.OnClickListener, StoriesFinderCallbacks, OnDetailStoryRemoval
 {
     private boolean isIntwoPanes;
     private String title;
@@ -29,6 +32,7 @@ public class PlaceStoriesActivity
     public static final int REQUEST_CODE_FOR_ADD_STORIE_ACTIVITY = 1;
     private boolean isFromWidget = false;
     private float DEFAULT_RATE = 2.5f;
+    private StorieDetailFragment fragment;
 
 
     @Override
@@ -144,7 +148,7 @@ public class PlaceStoriesActivity
             final Bundle arguments = new Bundle();
             arguments.putSerializable(StorieDetailFragment.STORIE_EXTRA, storie);
 
-            final StorieDetailFragment fragment = new StorieDetailFragment();
+            fragment = new StorieDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction().replace(R.id.item_detail_container, fragment).commit();
         }
@@ -191,4 +195,23 @@ public class PlaceStoriesActivity
     }
 
 
+    @Override
+    public void onActualDetailStoryRemove()
+    {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.story_removal_dialog_title);
+        builder.setMessage(R.string.story_removal_dialog_message);
+        builder.setCancelable(false);
+
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i)
+            {
+                getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+            }
+        });
+
+        builder.create().show();
+    }
 }

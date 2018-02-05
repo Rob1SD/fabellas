@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +12,6 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -23,10 +21,10 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.Map;
 
 import groupe_9.com.fabellas.ConnectionActivity;
-import groupe_9.com.fabellas.MapActivity;
 import groupe_9.com.fabellas.R;
 import groupe_9.com.fabellas.bo.Story;
 import groupe_9.com.fabellas.firebase.Utils;
+import groupe_9.com.fabellas.utils.OnDetailStoryRemoval;
 
 public class StorieDetailFragment extends Fragment implements View.OnClickListener
 {
@@ -41,6 +39,7 @@ public class StorieDetailFragment extends Fragment implements View.OnClickListen
 
     private DatabaseReference mStoriesMyNotationDatabaseReference;
     private DatabaseReference mStoriesRateDatabaseReference;
+    private DatabaseReference mStorieDatabaseReference;
 
     public StorieDetailFragment()
     {
@@ -78,9 +77,8 @@ public class StorieDetailFragment extends Fragment implements View.OnClickListen
 
             validate.setOnClickListener(this);
 
-            mStoriesRateDatabaseReference = Utils.getDatabase().getReference("Stories")
-                    .child(storie.getUID());
-            mStoriesMyNotationDatabaseReference.addChildEventListener(getNotationExistenceListener());
+            mStorieDatabaseReference = Utils.getDatabase().getReference("Stories").child(storie.getUID());
+            mStorieDatabaseReference.addValueEventListener(getNotationExistenceListener());
 
             mStoriesRateDatabaseReference = Utils.getDatabase().getReference("Stories")
                     .child(storie.getUID()).child("rate");
@@ -153,44 +151,34 @@ public class StorieDetailFragment extends Fragment implements View.OnClickListen
         };
     }
 
-    private ChildEventListener getNotationExistenceListener()
+    private ValueEventListener getNotationExistenceListener()
     {
-        return new ChildEventListener()
+        return new ValueEventListener()
         {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s)
+            public void onDataChange(DataSnapshot dataSnapshot)
             {
-                Log.i(MapActivity.TAG, "added");
-
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s)
-            {
-                Log.i(MapActivity.TAG, "changed");
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot)
-            {
-                Log.i(MapActivity.TAG, "removed");
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s)
-            {
-                Log.i(MapActivity.TAG, "moved");
+                if (dataSnapshot != null)
+                {
+                    if (dataSnapshot.getValue(Story.class) == null)
+                    {
+                        handleStoryRemoval();
+                    }
+                }
 
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError)
             {
-                Log.i(MapActivity.TAG, "cancelled");
 
             }
         };
+    }
+
+    private void handleStoryRemoval()
+    {
+        ((OnDetailStoryRemoval) getActivity()).onActualDetailStoryRemove();
     }
 
     private ValueEventListener getStoryNotationListener()
