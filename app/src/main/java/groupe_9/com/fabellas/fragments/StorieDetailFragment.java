@@ -1,6 +1,7 @@
 package groupe_9.com.fabellas.fragments;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -176,9 +177,14 @@ public class StorieDetailFragment extends Fragment implements View.OnClickListen
         };
     }
 
+
     private void handleStoryRemoval()
     {
-        ((OnDetailStoryRemoval) getActivity()).onActualDetailStoryRemove();
+        final OnDetailStoryRemoval activity = (OnDetailStoryRemoval) getActivity();
+        if (activity != null)
+        {
+            activity.onActualDetailStoryRemove();
+        }
     }
 
     private ValueEventListener getStoryNotationListener()
