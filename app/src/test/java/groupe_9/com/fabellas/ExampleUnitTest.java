@@ -18,10 +18,10 @@ public class ExampleUnitTest
     }
 
 
-    @Test
+  /*  @Test
     public void addition_isCorrect_fail_test() throws Exception
     {
         assertEquals(5, 2 + 2);
     }
-
+*/
 }
