@@ -26,7 +26,7 @@ public class PlaceStoriesActivity
         extends StoriesListActivity
         implements OnStoryClickable, View.OnClickListener, StoriesFinderCallbacks, OnDetailStoryRemoval
 {
-    private boolean isIntwoPanes;
+    private boolean isIntwoPanes = false;
     private String title;
     private String id;
     public static final int REQUEST_CODE_FOR_ADD_STORIE_ACTIVITY = 1;
@@ -118,6 +118,10 @@ public class PlaceStoriesActivity
                     this.id = placeTag.getId();
                     break;
                 case FabellasAppWidgetProvider.INTENT_FROM_APPWIDGET_ITEM:
+                    if (findViewById(R.id.item_detail_container) != null)
+                    {
+                        isIntwoPanes = true;
+                    }
                     isFromWidget = true;
                     final Story storie = (Story) intent.getSerializableExtra(FabellasAppWidgetProvider.STORIE);
                     final int widgetID = intent.getIntExtra(FabellasAppWidgetProvider.WIDGET_ID, 0);

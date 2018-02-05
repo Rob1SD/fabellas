@@ -68,7 +68,7 @@ public class MapActivity
         GoogleApiClient.OnConnectionFailedListener,
         GoogleApiClient.ConnectionCallbacks, View.OnClickListener, ClusterManager.OnClusterItemInfoWindowClickListener<PlaceItem>, ClusterManager.OnClusterClickListener<PlaceItem>
 {
-    public static final int ZOOM = 17;
+    public static final int ZOOM = 18;
     private static final int REQUEST_APPLICATION_SETTINGS_CODE = 1000;
     private static final int REQUEST_LOCATION_ON_SETTINGS_CODE = 2000;
     public static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 3000;
@@ -405,6 +405,7 @@ public class MapActivity
                     .build(this);
             startActivityForResult(intent, MapActivity.PLACE_AUTOCOMPLETE_REQUEST_CODE);
         }
+
         catch (GooglePlayServicesRepairableException e)
         {
             Toast.makeText(this, "An error occured", Toast.LENGTH_SHORT).show();
