@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -21,6 +23,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.Map;
 
 import groupe_9.com.fabellas.ConnectionActivity;
+import groupe_9.com.fabellas.MapActivity;
 import groupe_9.com.fabellas.R;
 import groupe_9.com.fabellas.bo.Story;
 import groupe_9.com.fabellas.firebase.Utils;
@@ -76,7 +79,13 @@ public class StorieDetailFragment extends Fragment implements View.OnClickListen
             validate.setOnClickListener(this);
 
             mStoriesRateDatabaseReference = Utils.getDatabase().getReference("Stories")
+                    .child(storie.getUID());
+            mStoriesMyNotationDatabaseReference.addChildEventListener(getNotationExistenceListener());
+
+            mStoriesRateDatabaseReference = Utils.getDatabase().getReference("Stories")
                     .child(storie.getUID()).child("rate");
+
+
             mStoriesRateDatabaseReference.addValueEventListener(getStoryNotationListener());
 
             if (FirebaseAuth.getInstance().getCurrentUser() == null)
@@ -140,6 +149,46 @@ public class StorieDetailFragment extends Fragment implements View.OnClickListen
             @Override
             public void onCancelled(DatabaseError databaseError)
             {
+            }
+        };
+    }
+
+    private ChildEventListener getNotationExistenceListener()
+    {
+        return new ChildEventListener()
+        {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s)
+            {
+                Log.i(MapActivity.TAG, "added");
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s)
+            {
+                Log.i(MapActivity.TAG, "changed");
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot)
+            {
+                Log.i(MapActivity.TAG, "removed");
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s)
+            {
+                Log.i(MapActivity.TAG, "moved");
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError)
+            {
+                Log.i(MapActivity.TAG, "cancelled");
+
             }
         };
     }
