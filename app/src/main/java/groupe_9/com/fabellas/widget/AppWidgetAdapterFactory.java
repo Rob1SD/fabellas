@@ -125,7 +125,10 @@ public class AppWidgetAdapterFactory
     @Override
     public void onStoryFound(Story storie)
     {
-        stories.add(storie);
+        if (stories != null)
+        {
+            stories.add(storie);
+        }
         Log.i("thomasecalle", "Widget, onDataChanged, get story : " + storie.getTitle());
         FabellasAppWidgetProvider.sendRefreshBroadcast(context);
     }
