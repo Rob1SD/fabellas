@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 public class AddStorieActivity extends AppCompatActivity implements View.OnClickListener {
 
+
     private TextView title;
     private TextView details;
     public static final String TITLE_VALUE = "TITLE_VALUE";
