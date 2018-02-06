@@ -26,7 +26,7 @@ public class YesNoDialogFragment extends DialogFragment {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
         alertDialogBuilder.setTitle("Confirmation");
         alertDialogBuilder.setMessage("Etes-vous sûr de vouloir supprimer cette anecdote ?");
-        //null should be your on click listener-
+        //null should be your on click listener-----
         alertDialogBuilder.setPositiveButton("OUI", (dialog, i) -> {
             UserStoriesActivity callingActivity = (UserStoriesActivity) getActivity();
             Bundle bundle = getArguments();
